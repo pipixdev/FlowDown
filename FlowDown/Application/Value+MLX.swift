@@ -70,14 +70,14 @@ extension MLX.GPU {
         let limit = CacheSizeLimit(rawValue: value) ?? .notAllowed
         switch limit {
         case .notAllowed:
-            set(cacheLimit: 0)
-            clearCache()
+            MLX.Memory.cacheLimit = 0
+            MLX.Memory.clearCache()
         case .allowedInForeground:
-            set(cacheLimit: 0)
-            clearCache()
+            MLX.Memory.cacheLimit = 0
+            MLX.Memory.clearCache()
         #if targetEnvironment(macCatalyst)
             case .unrestricted:
-                set(cacheLimit: .max)
+                MLX.Memory.cacheLimit = .max
         #endif
         }
     }
@@ -88,13 +88,13 @@ extension MLX.GPU {
         let limit = CacheSizeLimit(rawValue: value) ?? .notAllowed
         switch limit {
         case .notAllowed:
-            set(cacheLimit: 0)
-            clearCache()
+            MLX.Memory.cacheLimit = 0
+            MLX.Memory.clearCache()
         case .allowedInForeground:
-            set(cacheLimit: .max)
+            MLX.Memory.cacheLimit = .max
         #if targetEnvironment(macCatalyst)
             case .unrestricted:
-                set(cacheLimit: .max)
+                MLX.Memory.cacheLimit = .max
         #endif
         }
     }
