@@ -97,14 +97,15 @@ enum PrivateBlurEngine {
     private static func makeFilter(type: String) -> NSObject? {
         guard let data = Data(base64Encoded: "Q0FGaWx0ZXI="),
               let filterClassString = String(data: data, encoding: .utf8),
-              let filterClass = NSClassFromString(filterClassString) as? NSObjectProtocol
+              let filterClass = NSClassFromString(filterClassString)
         else {
             return nil
         }
 
+        let filterClassObject = filterClass as AnyObject
         let selector = NSSelectorFromString(_k("ZmlsdGVyV2l0aFR5cGU6"))
-        guard filterClass.responds(to: selector),
-              let unmanagedFilter = (filterClass as AnyObject).perform(selector, with: type)
+        guard filterClassObject.responds(to: selector),
+              let unmanagedFilter = filterClassObject.perform(selector, with: type)
         else {
             return nil
         }

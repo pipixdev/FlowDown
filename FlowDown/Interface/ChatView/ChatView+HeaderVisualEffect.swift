@@ -114,23 +114,32 @@ final class ChatHeaderGlassBackgroundContainerView: UIView {
     }
 
     override init(frame: CGRect) {
-        if #available(iOS 26.0, macCatalyst 26.0, *) {
-            let effect = UIGlassContainerEffect()
-            effect.spacing = 7.0
-            let effectView = UIVisualEffectView(effect: effect)
-            backgroundView = effectView
-            _contentView = effectView.contentView
-            self.effectView = effectView
-            enabledEffect = effect
-            legacyGlassView = nil
-        } else {
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26.0, *) {
+                let effect = UIGlassContainerEffect()
+                effect.spacing = 7.0
+                let effectView = UIVisualEffectView(effect: effect)
+                backgroundView = effectView
+                _contentView = effectView.contentView
+                self.effectView = effectView
+                enabledEffect = effect
+                legacyGlassView = nil
+            } else {
+                let legacyGlass = LegacyGlassBackdropView(blurRadius: 4.0, showsBorder: false)
+                backgroundView = legacyGlass
+                _contentView = legacyGlass.contentView
+                effectView = nil
+                enabledEffect = nil
+                legacyGlassView = legacyGlass
+            }
+        #else
             let legacyGlass = LegacyGlassBackdropView(blurRadius: 4.0, showsBorder: false)
             backgroundView = legacyGlass
             _contentView = legacyGlass.contentView
             effectView = nil
             enabledEffect = nil
             legacyGlassView = legacyGlass
-        }
+        #endif
 
         super.init(frame: frame)
         addSubview(backgroundView)
@@ -166,9 +175,11 @@ final class ChatHeaderGlassBackgroundContainerView: UIView {
     }
 
     func update(isDark: Bool) {
-        if #available(iOS 26.0, macCatalyst 26.0, *) {
-            backgroundView.overrideUserInterfaceStyle = isDark ? .dark : .light
-        }
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26.0, *) {
+                backgroundView.overrideUserInterfaceStyle = isDark ? .dark : .light
+            }
+        #endif
     }
 
     func setVisualEffectEnabled(_ isEnabled: Bool) {

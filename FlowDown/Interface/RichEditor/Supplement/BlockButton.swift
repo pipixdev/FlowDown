@@ -43,6 +43,11 @@ class BlockButton: UIButton {
         isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(onTapped))
         addGestureRecognizer(gesture)
+
+        _ = registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (button: BlockButton, _: UITraitCollection) in
+            button.applyDefaultAppearance()
+            button.updateAppearanceAfterTraitChange()
+        }
     }
 
     @available(*, unavailable)
@@ -73,15 +78,6 @@ class BlockButton: UIButton {
             width: bounds.width - iconView.frame.maxX - spacing - inset,
             height: bounds.height - inset * 2,
         )
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        guard previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle else { return }
-
-        applyDefaultAppearance()
-        updateAppearanceAfterTraitChange()
     }
 
     @objc private func onTapped() {

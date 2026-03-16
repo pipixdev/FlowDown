@@ -372,13 +372,7 @@ extension ChatView {
 
             let safeTop = safeAreaInsets.top
 
-            let usesUnifiedBackdrop = if #available(iOS 26.0, macCatalyst 26.0, *) {
-                false
-            } else {
-                true
-            }
-
-            if usesUnifiedBackdrop {
+            #if targetEnvironment(macCatalyst)
                 backgroundContainer.frame = CGRect(
                     x: 0,
                     y: 0,
@@ -386,25 +380,51 @@ extension ChatView {
                     height: bounds.height,
                 )
                 backgroundContainer.setContentTopOffset(safeTop)
-            } else {
-                backgroundContainer.frame = CGRect(
-                    x: 0,
-                    y: safeTop,
-                    width: bounds.width,
-                    height: max(0, bounds.height - safeTop),
-                )
-                backgroundContainer.setContentTopOffset(0)
-            }
 
-            let edgeHeight = bounds.height + 14
-            edgeEffectView.update(
-                content: .background,
-                blur: !usesUnifiedBackdrop,
-                alpha: 0.85,
-                rect: CGRect(x: 0, y: 0, width: bounds.width, height: edgeHeight),
-                edge: .top,
-                edgeSize: min(54, edgeHeight),
-            )
+                let edgeHeight = bounds.height + 14
+                edgeEffectView.update(
+                    content: .background,
+                    blur: true,
+                    alpha: 0.85,
+                    rect: CGRect(x: 0, y: 0, width: bounds.width, height: edgeHeight),
+                    edge: .top,
+                    edgeSize: min(54, edgeHeight),
+                )
+            #else
+                let usesUnifiedBackdrop: Bool = if #available(iOS 26.0, *) {
+                    false
+                } else {
+                    true
+                }
+
+                if usesUnifiedBackdrop {
+                    backgroundContainer.frame = CGRect(
+                        x: 0,
+                        y: 0,
+                        width: bounds.width,
+                        height: bounds.height,
+                    )
+                    backgroundContainer.setContentTopOffset(safeTop)
+                } else {
+                    backgroundContainer.frame = CGRect(
+                        x: 0,
+                        y: safeTop,
+                        width: bounds.width,
+                        height: max(0, bounds.height - safeTop),
+                    )
+                    backgroundContainer.setContentTopOffset(0)
+                }
+
+                let edgeHeight = bounds.height + 14
+                edgeEffectView.update(
+                    content: .background,
+                    blur: usesUnifiedBackdrop,
+                    alpha: 0.85,
+                    rect: CGRect(x: 0, y: 0, width: bounds.width, height: edgeHeight),
+                    edge: .top,
+                    edgeSize: min(54, edgeHeight),
+                )
+            #endif
         }
 
         deinit {

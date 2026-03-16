@@ -21,23 +21,25 @@ extension UIView {
         interactive: Bool = true,
         cornerStyle: GlassEffectCornerStyle = .none,
     ) -> UIView {
-        if #available(iOS 26, *) {
-            let effect = UIGlassEffect()
-            effect.isInteractive = interactive
-            let container = UIVisualEffectView(effect: effect)
-            container.clipsToBounds = true
-            switch cornerStyle {
-            case .none:
-                break
-            case let .fixed(radius):
-                container.cornerConfiguration = .corners(radius: .fixed(radius))
-            case .capsule:
-                container.cornerConfiguration = .capsule()
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26, *) {
+                let effect = UIGlassEffect()
+                effect.isInteractive = interactive
+                let container = UIVisualEffectView(effect: effect)
+                container.clipsToBounds = true
+                switch cornerStyle {
+                case .none:
+                    break
+                case let .fixed(radius):
+                    container.cornerConfiguration = .corners(radius: .fixed(radius))
+                case .capsule:
+                    container.cornerConfiguration = .capsule()
+                }
+                container.contentView.addSubview(self)
+                snp.makeConstraints { $0.edges.equalToSuperview() }
+                return container
             }
-            container.contentView.addSubview(self)
-            snp.makeConstraints { $0.edges.equalToSuperview() }
-            return container
-        }
+        #endif
 
         let container = LegacyGlassBackdropView(blurRadius: 4.0)
         switch cornerStyle {
@@ -56,9 +58,11 @@ extension UIView {
 
 extension UIVisualEffectView {
     static func adaptive(style: UIBlurEffect.Style = .systemMaterial) -> UIVisualEffectView {
-        if #available(iOS 26, *) {
-            return UIVisualEffectView(effect: UIGlassEffect())
-        }
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26, *) {
+                return UIVisualEffectView(effect: UIGlassEffect())
+            }
+        #endif
         return UIVisualEffectView(effect: UIBlurEffect(style: style))
     }
 }

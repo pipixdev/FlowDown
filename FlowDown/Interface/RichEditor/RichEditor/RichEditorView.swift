@@ -5,24 +5,28 @@ private enum RichEditorShadowStyle {
     case legacy(UIColor)
 
     static func resolve(handlerColor: UIColor) -> Self {
-        if #available(iOS 26, *) {
-            .glass
-        } else {
-            .legacy(handlerColor)
-        }
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26, *) {
+                return .glass
+            }
+        #endif
+        return .legacy(handlerColor)
     }
 
     func applyAppearance(
         to shadowContainer: UIView,
         colorfulShadow: ColorfulShadowView,
+        glassEffectView: UIVisualEffectView?,
     ) {
         switch self {
         case .glass:
             shadowContainer.backgroundColor = .clear
             colorfulShadow.isHidden = true
+            glassEffectView?.isHidden = false
         case let .legacy(color):
             shadowContainer.backgroundColor = color
             colorfulShadow.isHidden = false
+            glassEffectView?.isHidden = true
         }
     }
 
@@ -30,11 +34,14 @@ private enum RichEditorShadowStyle {
         containerFrame: CGRect,
         cornerRadius: CGFloat,
         to colorfulShadow: ColorfulShadowView,
+        glassEffectView: UIVisualEffectView?,
     ) {
         switch self {
         case .glass:
             colorfulShadow.frame = .zero
+            glassEffectView?.frame = containerFrame
         case .legacy:
+            glassEffectView?.frame = .zero
             let shadowInset: CGFloat = 8
             let shadowBlur: CGFloat = 8
             colorfulShadow.frame = containerFrame.insetBy(
@@ -86,6 +93,7 @@ class RichEditorView: EditorSectionView {
 
     let shadowContainer = UIView()
     let colorfulShadow = ColorfulShadowView()
+    private var glassEffectView: UIVisualEffectView?
     let dropContainer = DropView()
     let dropColorView = UIView()
     let attachmentSeprator = UIView()
@@ -127,6 +135,20 @@ class RichEditorView: EditorSectionView {
         shadowContainer.backgroundColor = handlerColor
         shadowContainer.clipsToBounds = false
         addSubview(shadowContainer)
+
+        #if !targetEnvironment(macCatalyst)
+            if #available(iOS 26, *) {
+                let glass = UIGlassEffect()
+                glass.isInteractive = true
+                let effectView = UIVisualEffectView(effect: glass)
+                effectView.layer.cornerRadius = shadowContainer.layer.cornerRadius
+                effectView.layer.cornerCurve = .continuous
+                effectView.clipsToBounds = true
+                addSubview(effectView)
+                glassEffectView = effectView
+            }
+        #endif
+
         applyShadowStyle()
 
         dropContainer.clipsToBounds = true
@@ -247,6 +269,7 @@ class RichEditorView: EditorSectionView {
         shadowStyle.applyAppearance(
             to: shadowContainer,
             colorfulShadow: colorfulShadow,
+            glassEffectView: glassEffectView,
         )
     }
 
@@ -255,6 +278,7 @@ class RichEditorView: EditorSectionView {
             containerFrame: shadowContainer.frame,
             cornerRadius: shadowContainer.layer.cornerRadius,
             to: colorfulShadow,
+            glassEffectView: glassEffectView,
         )
     }
 
