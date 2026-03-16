@@ -49,7 +49,7 @@ enum PrivateBlurEngine {
             let selector = NSSelectorFromString("alloc")
             let method: (@convention(c) (AnyObject, Selector) -> NSObject?)? = getMethod(
                 object: backdropLayerClass,
-                selector: "alloc"
+                selector: "alloc",
             )
             guard let method else {
                 return nil
@@ -69,7 +69,7 @@ enum PrivateBlurEngine {
         let selector = NSSelectorFromString("init")
         let method: (@convention(c) (NSObject, Selector) -> NSObject?)? = getMethod(
             object: allocatedObject,
-            selector: "init"
+            selector: "init",
         )
         guard let method else {
             return nil
@@ -121,7 +121,7 @@ enum PrivateBlurEngine {
     static func makeVariableBlurFilter(
         radius: CGFloat,
         maskImage: CGImage,
-        isTransparent: Bool
+        isTransparent: Bool,
     ) -> NSObject? {
         guard let variableBlur = makeFilter(type: _k("dmFyaWFibGVCbHVy")) else {
             return nil
@@ -140,7 +140,7 @@ enum PrivateBlurEngine {
     static func makeVariableBlurFilter(
         radius: CGFloat,
         sublayerSourceName: String,
-        isTransparent: Bool
+        isTransparent: Bool,
     ) -> NSObject? {
         guard let variableBlur = makeFilter(type: _k("dmFyaWFibGVCbHVy")) else {
             return nil
@@ -168,17 +168,17 @@ enum PrivateBlurEngine {
             self.isTransparent = isTransparent
 
             let backdrop = PrivateBlurEngine.makeBackdropLayer()
-            self.backdropLayer = backdrop
+            backdropLayer = backdrop
 
             if #available(iOS 26.0, macCatalyst 26.0, *) {
                 let maskView = UIImageView()
                 maskView.contentMode = .scaleToFill
                 maskView.layer.name = PrivateBlurEngine.maskSourceLayerName
-                self.maskSourceView = maskView
-                self.usesSublayerSource = true
+                maskSourceView = maskView
+                usesSublayerSource = true
             } else {
-                self.maskSourceView = nil
-                self.usesSublayerSource = false
+                maskSourceView = nil
+                usesSublayerSource = false
             }
 
             super.init(frame: .zero)
@@ -192,7 +192,7 @@ enum PrivateBlurEngine {
                     if let filter = PrivateBlurEngine.makeVariableBlurFilter(
                         radius: maxBlurRadius,
                         sublayerSourceName: PrivateBlurEngine.maskSourceLayerName,
-                        isTransparent: isTransparent
+                        isTransparent: isTransparent,
                     ) {
                         backdrop.filters = [filter]
                     }
@@ -243,7 +243,7 @@ enum PrivateBlurEngine {
                   let filter = PrivateBlurEngine.makeVariableBlurFilter(
                       radius: maxBlurRadius,
                       maskImage: cgImage,
-                      isTransparent: isTransparent
+                      isTransparent: isTransparent,
                   )
             else {
                 backdropLayer?.filters = nil

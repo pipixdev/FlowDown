@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/ColorVector.git",
       "state" : {
-        "revision" : "6da8726bf38d68eb943d0f2139ac2a1fac70e65b",
-        "version" : "1.0.4"
+        "revision" : "0cd0169f1487d7371ee3fd7fe93f1e918fd93d00",
+        "version" : "1.0.5"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/ConfigurableKit",
       "state" : {
-        "revision" : "65faa3328dcda472f9f3e4e2ec43807217f2b488",
-        "version" : "3.1.2"
+        "revision" : "371e7664066e180213a6e9c1baa727aa970729cb",
+        "version" : "3.2.0"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattt/eventsource.git",
       "state" : {
-        "revision" : "bd64824505da71a1a403adb221f6e25413c0bc7f",
-        "version" : "1.4.0"
+        "revision" : "a3a85a85214caf642abaa96ae664e4c772a59f6e",
+        "version" : "1.4.1"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/Litext",
       "state" : {
-        "revision" : "3cbe3ffa94f6a2cf7fa7cf91e4f2aeac437d3a1f",
-        "version" : "1.1.0"
+        "revision" : "a2ed9b63ae623a20591effc72f9db7d04e41a64c",
+        "version" : "1.2.1"
       }
     },
     {
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/MarkdownView",
       "state" : {
-        "revision" : "b33f699a388939fc543c935b870675b91ecbc9f6",
-        "version" : "3.7.0"
+        "revision" : "37f97345a108e95f66b6671c317b43063c7f2de1",
+        "version" : "3.8.2"
       }
     },
     {
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/MSDisplayLink",
       "state" : {
-        "revision" : "ebf5823cb5fc1326639d9a05bc06d16bbe82989f",
-        "version" : "2.0.8"
+        "revision" : "1ba3e769b734e456317fa7e45321fa7f53eefb67",
+        "version" : "2.1.0"
       }
     },
     {
@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms.git",
       "state" : {
-        "revision" : "2971dd5d9f6e0515664b01044826bcea16e59fac",
-        "version" : "1.1.2"
+        "revision" : "9d349bcc328ac3c31ce40e746b5882742a0d1272",
+        "version" : "1.1.3"
       }
     },
     {
@@ -266,8 +266,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "6f70fa9eab24c1fd982af18c281c4525d05e3095",
-        "version" : "4.2.0"
+        "revision" : "fa308c07a6fa04a727212d793e761460e41049c3",
+        "version" : "4.3.0"
       }
     },
     {
@@ -293,8 +293,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio.git",
       "state" : {
-        "revision" : "e932d3c4d8f77433c8f7093b5ebcbf91463948a0",
-        "version" : "2.95.0"
+        "revision" : "b31565862a8f39866af50bc6676160d8dda7de35",
+        "version" : "2.96.0"
       }
     },
     {
@@ -356,8 +356,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup",
       "state" : {
-        "revision" : "d86f244ed497d48012782e2f59c985a55e77b3f5",
-        "version" : "2.11.3"
+        "revision" : "dba183c96b2da4e4b80bb31b1e2e59cb9542b8fc",
+        "version" : "2.13.1"
       }
     },
     {

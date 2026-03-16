@@ -17,7 +17,9 @@ final class LegacyGlassBackdropView: UIView {
     private var isEffectEnabled = true
     var contentTopOffset: CGFloat = 0
 
-    var contentView: UIView { hostedContentView }
+    var contentView: UIView {
+        hostedContentView
+    }
 
     init(blurRadius: CGFloat = 4.0, showsBorder: Bool = true) {
         self.blurRadius = blurRadius
@@ -87,7 +89,7 @@ final class LegacyGlassBackdropView: UIView {
                 x: 0,
                 y: contentTopOffset,
                 width: bounds.width,
-                height: max(0, bounds.height - contentTopOffset)
+                height: max(0, bounds.height - contentTopOffset),
             )
         } else {
             hostedContentView.frame = bounds

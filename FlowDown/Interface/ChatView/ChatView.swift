@@ -372,11 +372,10 @@ extension ChatView {
 
             let safeTop = safeAreaInsets.top
 
-            let usesUnifiedBackdrop: Bool
-            if #available(iOS 26.0, macCatalyst 26.0, *) {
-                usesUnifiedBackdrop = false
+            let usesUnifiedBackdrop = if #available(iOS 26.0, macCatalyst 26.0, *) {
+                false
             } else {
-                usesUnifiedBackdrop = true
+                true
             }
 
             if usesUnifiedBackdrop {
@@ -384,7 +383,7 @@ extension ChatView {
                     x: 0,
                     y: 0,
                     width: bounds.width,
-                    height: bounds.height
+                    height: bounds.height,
                 )
                 backgroundContainer.setContentTopOffset(safeTop)
             } else {
@@ -392,7 +391,7 @@ extension ChatView {
                     x: 0,
                     y: safeTop,
                     width: bounds.width,
-                    height: max(0, bounds.height - safeTop)
+                    height: max(0, bounds.height - safeTop),
                 )
                 backgroundContainer.setContentTopOffset(0)
             }
@@ -404,7 +403,7 @@ extension ChatView {
                 alpha: 0.85,
                 rect: CGRect(x: 0, y: 0, width: bounds.width, height: edgeHeight),
                 edge: .top,
-                edgeSize: min(54, edgeHeight)
+                edgeSize: min(54, edgeHeight),
             )
         }
 

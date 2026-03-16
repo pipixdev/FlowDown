@@ -19,7 +19,7 @@ enum GlassEffectCornerStyle {
 extension UIView {
     func wrappedInGlassEffect(
         interactive: Bool = true,
-        cornerStyle: GlassEffectCornerStyle = .none
+        cornerStyle: GlassEffectCornerStyle = .none,
     ) -> UIView {
         if #available(iOS 26, *) {
             let effect = UIGlassEffect()
@@ -35,7 +35,7 @@ extension UIView {
                 container.cornerConfiguration = .capsule()
             }
             container.contentView.addSubview(self)
-            self.snp.makeConstraints { $0.edges.equalToSuperview() }
+            snp.makeConstraints { $0.edges.equalToSuperview() }
             return container
         }
 
@@ -49,7 +49,7 @@ extension UIView {
             container.setCapsuleCorners()
         }
         container.contentView.addSubview(self)
-        self.snp.makeConstraints { $0.edges.equalToSuperview() }
+        snp.makeConstraints { $0.edges.equalToSuperview() }
         return container
     }
 }

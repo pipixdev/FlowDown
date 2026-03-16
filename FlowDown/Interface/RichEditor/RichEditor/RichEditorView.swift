@@ -14,7 +14,7 @@ private enum RichEditorShadowStyle {
 
     func applyAppearance(
         to shadowContainer: UIView,
-        colorfulShadow: ColorfulShadowView
+        colorfulShadow: ColorfulShadowView,
     ) {
         switch self {
         case .glass:
@@ -29,7 +29,7 @@ private enum RichEditorShadowStyle {
     func applyGeometry(
         containerFrame: CGRect,
         cornerRadius: CGFloat,
-        to colorfulShadow: ColorfulShadowView
+        to colorfulShadow: ColorfulShadowView,
     ) {
         switch self {
         case .glass:
@@ -39,18 +39,18 @@ private enum RichEditorShadowStyle {
             let shadowBlur: CGFloat = 8
             colorfulShadow.frame = containerFrame.insetBy(
                 dx: -shadowInset - shadowBlur,
-                dy: -shadowInset - shadowBlur
+                dy: -shadowInset - shadowBlur,
             )
             colorfulShadow.updateGeometry(.init(
                 innerRect: CGRect(
                     x: shadowInset + shadowBlur,
                     y: shadowInset + shadowBlur,
                     width: containerFrame.width,
-                    height: containerFrame.height
+                    height: containerFrame.height,
                 ),
                 cornerRadius: cornerRadius,
                 blur: shadowBlur,
-                offset: .zero
+                offset: .zero,
             ))
         }
     }
@@ -246,7 +246,7 @@ class RichEditorView: EditorSectionView {
     private func applyShadowStyle() {
         shadowStyle.applyAppearance(
             to: shadowContainer,
-            colorfulShadow: colorfulShadow
+            colorfulShadow: colorfulShadow,
         )
     }
 
@@ -254,7 +254,7 @@ class RichEditorView: EditorSectionView {
         shadowStyle.applyGeometry(
             containerFrame: shadowContainer.frame,
             cornerRadius: shadowContainer.layer.cornerRadius,
-            to: colorfulShadow
+            to: colorfulShadow,
         )
     }
 

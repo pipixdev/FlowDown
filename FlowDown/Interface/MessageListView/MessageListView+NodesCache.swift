@@ -35,7 +35,7 @@ extension MessageListView {
 
         private func renderOnMain(
             result: MarkdownParser.ParseResult,
-            theme: MarkdownTheme
+            theme: MarkdownTheme,
         ) -> (RenderedTextContent.Map, [Int: CodeHighlighter.HighlightMap]) {
             let work = { @MainActor in
                 let rendered: RenderedTextContent.Map = result.render(theme: theme)

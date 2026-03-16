@@ -17,7 +17,7 @@ private func generateChatHeaderImage(
     _ size: CGSize,
     opaque: Bool = false,
     scale: CGFloat = 0,
-    draw: (CGSize, CGContext) -> Void
+    draw: (CGSize, CGContext) -> Void,
 ) -> UIImage? {
     guard size.width > 0, size.height > 0 else {
         return nil
@@ -39,7 +39,7 @@ private func generateChatHeaderGradientImage(
     size: CGSize,
     colors: [UIColor],
     locations: [CGFloat],
-    isInverted: Bool = false
+    isInverted: Bool = false,
 ) -> UIImage? {
     guard colors.count == locations.count, !colors.isEmpty else {
         return nil
@@ -52,7 +52,7 @@ private func generateChatHeaderGradientImage(
         guard let gradient = CGGradient(
             colorsSpace: colorSpace,
             colors: gradientColors,
-            locations: &gradientLocations
+            locations: &gradientLocations,
         ) else {
             return
         }
@@ -62,14 +62,14 @@ private func generateChatHeaderGradientImage(
                 gradient,
                 start: CGPoint(x: 0, y: size.height),
                 end: CGPoint(x: 0, y: 0),
-                options: []
+                options: [],
             )
         } else {
             context.drawLinearGradient(
                 gradient,
                 start: CGPoint(x: 0, y: 0),
                 end: CGPoint(x: 0, y: size.height),
-                options: []
+                options: [],
             )
         }
     }
@@ -78,7 +78,7 @@ private func generateChatHeaderGradientImage(
 private enum ChatHeaderEdgeCurve {
     static func gradient(baseHeight: CGFloat) -> ChatHeaderBlurGradient {
         let sampleCount = max(24, min(96, Int(baseHeight.rounded(.up)) * 2))
-        let positions = (0..<sampleCount).map { index in
+        let positions = (0 ..< sampleCount).map { index in
             CGFloat(index) / CGFloat(sampleCount - 1)
         }
         let alpha = positions.map { position in
@@ -89,7 +89,7 @@ private enum ChatHeaderEdgeCurve {
         return ChatHeaderBlurGradient(
             height: baseHeight,
             alpha: alpha,
-            positions: positions
+            positions: positions,
         )
     }
 
@@ -109,7 +109,9 @@ final class ChatHeaderGlassBackgroundContainerView: UIView {
     private let enabledEffect: UIVisualEffect?
     private let legacyGlassView: LegacyGlassBackdropView?
 
-    var contentView: UIView { _contentView }
+    var contentView: UIView {
+        _contentView
+    }
 
     override init(frame: CGRect) {
         if #available(iOS 26.0, macCatalyst 26.0, *) {
@@ -212,7 +214,7 @@ private final class ChatHeaderVariableBlurView: UIView {
             size: size,
             constantHeight: constantHeight,
             isInverted: isInverted,
-            gradient: gradient
+            gradient: gradient,
         )
         guard params != self.params else {
             return
@@ -226,8 +228,8 @@ private final class ChatHeaderVariableBlurView: UIView {
                 size: size,
                 constantHeight: constantHeight,
                 isInverted: isInverted,
-                gradient: gradient
-            )
+                gradient: gradient,
+            ),
         )
     }
 
@@ -235,7 +237,7 @@ private final class ChatHeaderVariableBlurView: UIView {
         size: CGSize,
         constantHeight: CGFloat,
         isInverted: Bool,
-        gradient: ChatHeaderBlurGradient
+        gradient: ChatHeaderBlurGradient,
     ) -> UIImage? {
         guard size.width > 0, size.height > 0 else {
             return nil
@@ -244,7 +246,7 @@ private final class ChatHeaderVariableBlurView: UIView {
         let gradientHeight = min(size.height, max(1.0, constantHeight))
         let gradientImage = ChatHeaderEdgeEffectView.generateEdgeGradient(
             baseHeight: max(1.0, gradient.height),
-            isInverted: isInverted
+            isInverted: isInverted,
         )
 
         return generateChatHeaderImage(size, opaque: false) { size, context in
@@ -257,20 +259,20 @@ private final class ChatHeaderVariableBlurView: UIView {
             if isInverted {
                 gradientFrame = CGRect(
                     origin: .zero,
-                    size: CGSize(width: size.width, height: gradientHeight)
+                    size: CGSize(width: size.width, height: gradientHeight),
                 )
                 solidFrame = CGRect(
                     origin: CGPoint(x: 0, y: gradientHeight),
-                    size: CGSize(width: size.width, height: max(0, size.height - gradientHeight))
+                    size: CGSize(width: size.width, height: max(0, size.height - gradientHeight)),
                 )
             } else {
                 gradientFrame = CGRect(
                     origin: CGPoint(x: 0, y: size.height - gradientHeight),
-                    size: CGSize(width: size.width, height: gradientHeight)
+                    size: CGSize(width: size.width, height: gradientHeight),
                 )
                 solidFrame = CGRect(
                     origin: .zero,
-                    size: CGSize(width: size.width, height: max(0, size.height - gradientHeight))
+                    size: CGSize(width: size.width, height: max(0, size.height - gradientHeight)),
                 )
             }
 
@@ -329,7 +331,7 @@ final class ChatHeaderEdgeEffectView: UIView {
             x: 0,
             y: contentTopOffset,
             width: bounds.width,
-            height: max(0, bounds.height - contentTopOffset)
+            height: max(0, bounds.height - contentTopOffset),
         )
         contentView.frame = contentFrame
         contentMaskView.frame = CGRect(origin: .zero, size: contentFrame.size)
@@ -348,7 +350,7 @@ final class ChatHeaderEdgeEffectView: UIView {
             let blurHeight = max(edgeSize, bounds.height - 14)
             let blurFrame = CGRect(
                 origin: CGPoint(x: 0, y: edge == .bottom ? (bounds.height - blurHeight) : 0),
-                size: CGSize(width: bounds.width, height: blurHeight)
+                size: CGSize(width: bounds.width, height: blurHeight),
             )
 
             let blurView: ChatHeaderVariableBlurView
@@ -364,11 +366,11 @@ final class ChatHeaderEdgeEffectView: UIView {
                 size: blurFrame.size,
                 constantHeight: max(1.0, edgeSize - 4.0),
                 isInverted: edge == .bottom,
-                gradient: Self.generateEdgeGradientData(baseHeight: max(1.0, edgeSize - 4.0))
+                gradient: Self.generateEdgeGradientData(baseHeight: max(1.0, edgeSize - 4.0)),
             )
             blurView.frame = blurFrame
             blurView.transform = contentMaskView.transform
-        } else if let blurView = self.blurView {
+        } else if let blurView {
             self.blurView = nil
             blurView.removeFromSuperview()
         }
@@ -385,15 +387,15 @@ final class ChatHeaderEdgeEffectView: UIView {
             size: CGSize(width: 1.0, height: baseHeight),
             colors: colors,
             locations: gradientData.positions,
-            isInverted: isInverted
+            isInverted: isInverted,
         )!.resizableImage(
             withCapInsets: UIEdgeInsets(
                 top: isInverted ? baseHeight : 0,
                 left: 0,
                 bottom: isInverted ? 0 : baseHeight,
-                right: 0
+                right: 0,
             ),
-            resizingMode: .stretch
+            resizingMode: .stretch,
         )
     }
 }
