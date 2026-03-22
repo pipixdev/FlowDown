@@ -32,7 +32,7 @@ Join our community on [Discord](https://discord.gg/UHKMRyJcgc) for feedback and 
   - **Zero Data Retention**: All content and configurations you create remain entirely on your device or your private iCloud.
   - **Verifiable Source**: The source code is open and available for audit. You can verify exactly what the app is doing.
 - **Native Performance**:
-  - **Built From Scratch**: Built entirely with Swift and UIKit. We open-sourced our text rendering components for everyone.
+  - **Built From Scratch**: Built entirely with Swift and UIKit. We open-sourced our chat interface as [LanguageModelChatUI](https://github.com/Lakr233/LanguageModelChatUI) for everyone.
   - **Rich User Experience**: Enjoy full Markdown rendering, syntax highlighting, and a buttery-smooth interface that makes interacting with AI a pleasure.
   - **Optimized for Apple Platforms**: Leverages Metal and MLX for efficient on-device inference and smooth UI performance.
 - **Universal Compatibility**:
@@ -76,6 +76,7 @@ The decoupled libraries used to build, or extracted from FlowDown are listed bel
 - [ListViewKit](https://github.com/Lakr233/ListViewKit) - MIT License
 - [MarkdownView](https://github.com/Lakr233/MarkdownView) - MIT License
 - [GlyphixTextFx](https://github.com/ktiays/GlyphixTextFx/) - MIT License
+- [LanguageModelChatUI](https://github.com/Lakr233/LanguageModelChatUI) - MIT License
 
 Please note that while the code is open source, the FlowDown name, icon, and artwork are proprietary. For commercial licensing inquiries, please contact us.
 
