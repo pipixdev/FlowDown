@@ -60,8 +60,8 @@ extension UIUserInterfaceStyle {
         explain: "Override system appearance, either light or dark.",
         key: storageKey,
         defaultValue: UIUserInterfaceStyle.unspecified.rawValue,
-        annotation: .list {
-            UIUserInterfaceStyle.cases.map { item -> ListAnnotation.ValueItem in
+        annotation: .menu {
+            UIUserInterfaceStyle.cases.map { item -> MenuAnnotation.Option in
                 .init(
                     icon: item.icon,
                     title: item.title,

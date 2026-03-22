@@ -53,7 +53,7 @@ class MTUpdateMemoryTool: ModelTool, @unchecked Sendable {
             explain: "Allows AI to update existing memory content.",
             key: "wiki.qaq.ModelTools.UpdateMemoryTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

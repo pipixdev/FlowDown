@@ -119,7 +119,7 @@ enum MemoryProactiveProvisionSetting {
         explain: "Choose how we proactively shares stored memories with the model during conversations and automations. This includes system Shortcuts.",
         key: storageKey,
         defaultValue: MemoryProactiveProvisionScope.off.rawValue,
-        annotation: .list {
+        annotation: .menu {
             MemoryProactiveProvisionScope.allCases.map { scope in
                 .init(
                     icon: scope.icon,

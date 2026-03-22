@@ -27,6 +27,7 @@ open class StackScrollController: UIViewController {
 
         scrollView.clipsToBounds = true
         scrollView.alwaysBounceVertical = true
+        scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +35,9 @@ open class StackScrollController: UIViewController {
         scrollView.contentInset = .init(top: 0, left: 0, bottom: 32, right: 0)
 
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
 
         contentView.snp.makeConstraints { make in

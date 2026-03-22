@@ -25,12 +25,12 @@ class HubModelDownloadController: UIViewController {
     let tableView: UITableView
     let dataSource: DataSource
 
-    @BareCodableStorage(key: "ModelDownloadController.anchorToVerifiedAuthorMLX", defaultValue: true)
+    @TypedStorage(key: "ModelDownloadController.anchorToVerifiedAuthorMLX", defaultValue: true)
     var anchorToVerifiedAuthorMLX {
         didSet { updateDataSource() }
     }
 
-    @BareCodableStorage(key: "ModelDownloadController.anchorToTextGenerationModels", defaultValue: true)
+    @TypedStorage(key: "ModelDownloadController.anchorToTextGenerationModels", defaultValue: true)
     var anchorToTextGenerationModels {
         didSet { updateDataSource() }
     }

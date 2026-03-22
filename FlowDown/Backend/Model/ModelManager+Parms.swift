@@ -57,7 +57,7 @@ extension ModelManager {
         explain: "The default prompt shapes the model's responses. We provide presets with common instructions and information to enhance performance. A more detailed prompt can improve results but may increase costs. Please notice that system prompt is decided when creating new conversation, and will not be updated afterwards.",
         key: "CONFKIT.Model.Inference.Prompt.Default",
         defaultValue: PromptType.complete.rawValue,
-        annotation: .list {
+        annotation: .menu {
             PromptType.allCases.map { .init(
                 icon: $0.icon,
                 title: $0.title,
@@ -88,7 +88,7 @@ extension ModelManager {
         explain: "Insert the current model name, date, and locale in the system prompt for each request. Turn this off if your use caching systems to save cost.",
         key: ModelManager.shared.includeDynamicSystemInfoKey,
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
 
     static let temperatureConfigurableObject: ConfigurableObject = .init(
@@ -97,7 +97,7 @@ extension ModelManager {
         explain: "This parameter can be used to control the personality of the model. The more imaginative, the more unstable the output. This parameter is also known as temperature.",
         key: "CONFKIT.Model.Inference.Temperature",
         defaultValue: 0.75,
-        annotation: .list {
+        annotation: .menu {
             ModelManager.temperaturePresets.map { preset in
                 .init(
                     icon: preset.icon,
@@ -193,7 +193,7 @@ extension ModelManager {
         explain: "Adjust how aggressively web searches are triggered.",
         key: "Model.Inference.SearchSensitivity",
         defaultValue: SearchSensitivity.balanced.rawValue,
-        annotation: .list {
+        annotation: .menu {
             SearchSensitivity.allCases.map {
                 .init(icon: $0.icon, title: $0.title, rawValue: $0.rawValue)
             }

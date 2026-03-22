@@ -47,7 +47,7 @@ class MTListMemoriesTool: ModelTool, @unchecked Sendable {
             explain: "Allows AI to list memories with IDs for management operations.",
             key: "wiki.qaq.ModelTools.ListMemoriesTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

@@ -186,12 +186,12 @@ extension SettingController.SettingContent {
 
         var cancellable: Set<AnyCancellable> = []
 
-        @BareCodableStorage(key: "ModelController.showCloudModel", defaultValue: true)
+        @TypedStorage(key: "ModelController.showCloudModel", defaultValue: true)
         var showCloudModels {
             didSet { updateDataSource() }
         }
 
-        @BareCodableStorage(key: "ModelController.showLocalModel", defaultValue: true)
+        @TypedStorage(key: "ModelController.showLocalModel", defaultValue: true)
         var showLocalModels {
             didSet { updateDataSource() }
         }

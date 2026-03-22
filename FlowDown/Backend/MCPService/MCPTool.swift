@@ -64,7 +64,7 @@ class MCPTool: ModelTool, @unchecked Sendable {
             explain: "Tools from connected MCP servers",
             key: "MCP.Tools.Enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

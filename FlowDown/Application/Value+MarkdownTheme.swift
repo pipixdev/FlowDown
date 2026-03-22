@@ -34,9 +34,9 @@ extension MarkdownTheme {
         explain: "Adjust the font size of the markdown content.",
         key: storageKey,
         defaultValue: MarkdownTheme.FontScale.middle.rawValue,
-        annotation: .list {
+        annotation: .menu {
             MarkdownTheme.FontScale.allCases.map { input in
-                ListAnnotation.ValueItem(
+                MenuAnnotation.Option(
                     icon: "circle",
                     title: input.title,
                     rawValue: input.rawValue,

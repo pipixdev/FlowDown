@@ -34,59 +34,59 @@ class ModelManager: NSObject {
     let encoder = PropertyListEncoder()
     let decoder = PropertyListDecoder()
 
-    @BareCodableStorage(key: "Model.Inference.Prompt.Default", defaultValue: PromptType.complete)
+    @TypedStorage(key: "Model.Inference.Prompt.Default", defaultValue: PromptType.complete)
     var defaultPrompt: PromptType
-    @BareCodableStorage(key: "Model.Inference.Prompt.Additional", defaultValue: "")
+    @TypedStorage(key: "Model.Inference.Prompt.Additional", defaultValue: "")
     var additionalPrompt: String
-    @BareCodableStorage(key: "Model.Inference.Prompt.Temperature", defaultValue: 0.75)
+    @TypedStorage(key: "Model.Inference.Prompt.Temperature", defaultValue: 0.75)
     var temperature: Float
-    @BareCodableStorage(key: "Model.Inference.SearchSensitivity", defaultValue: SearchSensitivity.balanced)
+    @TypedStorage(key: "Model.Inference.SearchSensitivity", defaultValue: SearchSensitivity.balanced)
     var searchSensitivity: SearchSensitivity
 
-    @BareCodableStorage(
+    @TypedStorage(
         key: ModelManager.appleIntelligenceEnabledKey,
         defaultValue: true,
     )
     var appleIntelligenceEnabled: Bool
 
-    @BareCodableStorage(key: "Model.Default.Conversation", defaultValue: "")
+    @TypedStorage(key: "Model.Default.Conversation", defaultValue: "")
     // swiftformat:disable:next redundantFileprivate
     fileprivate var defaultModelForConversation: String {
         didSet { checkDefaultModels() }
     }
 
-    @BareCodableStorage(key: "Model.Default.Auxiliary.UseCurrentChatModel", defaultValue: true)
+    @TypedStorage(key: "Model.Default.Auxiliary.UseCurrentChatModel", defaultValue: true)
     // swiftformat:disable:next redundantFileprivate
     fileprivate var defaultModelForAuxiliaryTaskWillUseCurrentChatModel: Bool {
         didSet { checkDefaultModels() }
     }
 
-    @BareCodableStorage(key: "Model.Default.Auxiliary", defaultValue: "")
+    @TypedStorage(key: "Model.Default.Auxiliary", defaultValue: "")
     // swiftformat:disable:next redundantFileprivate
     fileprivate var defaultModelForAuxiliaryTask: String {
         didSet { checkDefaultModels() }
     }
 
-    @BareCodableStorage(key: "Model.Default.AuxiliaryVisual", defaultValue: "")
+    @TypedStorage(key: "Model.Default.AuxiliaryVisual", defaultValue: "")
     // swiftformat:disable:next redundantFileprivate
     fileprivate var defaultModelForAuxiliaryVisualTask: String {
         didSet { checkDefaultModels() }
     }
 
-    @BareCodableStorage(key: "Model.Default.AuxiliaryVisual.SkipIfPossible", defaultValue: true)
+    @TypedStorage(key: "Model.Default.AuxiliaryVisual.SkipIfPossible", defaultValue: true)
     // swiftformat:disable:next redundantFileprivate
     var defaultModelForAuxiliaryVisualTaskSkipIfPossible: Bool
     var defaultModelForAuxiliaryVisualTaskSkipIfPossibleKey: String {
         _defaultModelForAuxiliaryVisualTaskSkipIfPossible.key
     }
 
-    @BareCodableStorage(key: "Model.ChatInterface.CollapseReasoningSectionWhenComplete", defaultValue: false)
+    @TypedStorage(key: "Model.ChatInterface.CollapseReasoningSectionWhenComplete", defaultValue: false)
     var collapseReasoningSectionWhenComplete: Bool
     var collapseReasoningSectionWhenCompleteKey: String {
         _collapseReasoningSectionWhenComplete.key
     }
 
-    @BareCodableStorage(key: "Model.ChatInterface.IncludeDynamicSystemInfo", defaultValue: true)
+    @TypedStorage(key: "Model.ChatInterface.IncludeDynamicSystemInfo", defaultValue: true)
     var includeDynamicSystemInfo: Bool
     var includeDynamicSystemInfoKey: String {
         _includeDynamicSystemInfo.key

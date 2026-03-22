@@ -37,7 +37,7 @@ extension ChatView {
         explain: "Show full model name and information in the quick setting bar under the input box or not.",
         key: "app.chat.model.picker.style",
         defaultValue: EditorModelNameStyle.trimmed.rawValue,
-        annotation: .list {
+        annotation: .menu {
             EditorModelNameStyle.allCases.map {
                 .init(
                     icon: $0.icon,
@@ -54,6 +54,6 @@ extension ChatView {
         explain: "When selecting a new chat model, also set it as the default model.",
         key: "app.chat.model.picker.apply.to.default",
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
 }

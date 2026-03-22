@@ -49,8 +49,8 @@ extension StreamAudioEffectSetting {
         explain: "Play audio feedback during inference output. This helps determine if a task is complete when running in the background.",
         key: storageKey,
         defaultValue: StreamAudioEffectSetting.off.rawValue,
-        annotation: .list {
-            StreamAudioEffectSetting.allCases.map { item -> ListAnnotation.ValueItem in
+        annotation: .menu {
+            StreamAudioEffectSetting.allCases.map { item -> MenuAnnotation.Option in
                 .init(
                     icon: item.icon,
                     title: item.title,

@@ -39,7 +39,7 @@ class EmojiProvider {
         Self.bundledEmoji
     }
 
-    @BareCodableStorage(key: "EmojiPicker.RecentEmoji", defaultValue: [])
+    @TypedStorage(key: "EmojiPicker.RecentEmoji", defaultValue: [])
     var recentEmoji: [String]
 
     func obtainRecentUsed() -> [String] {

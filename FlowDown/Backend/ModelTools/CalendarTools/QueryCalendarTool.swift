@@ -66,7 +66,7 @@ class MTQueryCalendarTool: ModelTool, @unchecked Sendable {
             explain: "Allows LLM to read your calendar events.",
             key: "wiki.qaq.ModelTools.QueryCalendarTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

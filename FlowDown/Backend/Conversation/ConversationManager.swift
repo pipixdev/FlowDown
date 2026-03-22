@@ -15,7 +15,7 @@ import UIKit
 class ConversationManager: NSObject {
     static let shared = ConversationManager()
 
-    @BareCodableStorage(key: "wiki.qaq.conversation.editor.objects", defaultValue: [:])
+    @TypedStorage(key: "wiki.qaq.conversation.editor.objects", defaultValue: [:])
     private var _temporaryEditorObjects: [Conversation.ID: RichEditorView.Object] {
         didSet { assert(!Thread.isMainThread) }
     }

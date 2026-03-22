@@ -48,7 +48,7 @@ class MTStoreMemoryTool: ModelTool, @unchecked Sendable {
             explain: "Allows AI to store important information for future conversations.",
             key: "wiki.qaq.ModelTools.StoreMemoryTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

@@ -41,7 +41,7 @@ class MTRecallMemoryTool: ModelTool, @unchecked Sendable {
             explain: "Allows AI to retrieve stored memories for context.",
             key: "wiki.qaq.ModelTools.RecallMemoryTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

@@ -55,7 +55,7 @@ class MTAddCalendarTool: ModelTool, @unchecked Sendable {
             explain: "Allows LLM to save events to your calendar.",
             key: "wiki.qaq.ModelTools.AddCalendarTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

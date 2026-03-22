@@ -19,7 +19,7 @@ enum LiveActivitySetting {
         explain: "Show a Live Activity while streaming in the background.",
         key: storageKey,
         defaultValue: false,
-        annotation: .boolean,
+        annotation: .toggle,
     )
 
     static func isEnabled() -> Bool {

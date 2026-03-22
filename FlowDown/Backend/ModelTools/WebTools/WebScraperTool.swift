@@ -51,7 +51,7 @@ class MTWebScraperTool: ModelTool, @unchecked Sendable {
             explain: "Allows LLM to fetch and read content from web pages.",
             key: "wiki.qaq.ModelTools.WebScraperTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

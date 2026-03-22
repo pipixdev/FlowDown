@@ -85,7 +85,7 @@ extension SettingController.SettingContent {
             explain: "Enable this to automatically collapse reasoning content after the reasoning is completed. This is useful for keeping the chat interface clean and focused on the final response.",
             key: ModelManager.shared.collapseReasoningSectionWhenCompleteKey,
             defaultValue: false,
-            annotation: .boolean,
+            annotation: .toggle,
         )
         .createView()
 

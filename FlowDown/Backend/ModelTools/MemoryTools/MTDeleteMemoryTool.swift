@@ -51,7 +51,7 @@ class MTDeleteMemoryTool: ModelTool, @unchecked Sendable {
             explain: "Allows AI to delete specific memories that are no longer needed.",
             key: "wiki.qaq.ModelTools.DeleteMemoryTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

@@ -60,7 +60,7 @@ extension SettingController.SettingContent.SupportController {
                     icon: "safari",
                     title: "Open Documentation",
                     explain: "We provided a comprehensive documentation to help you understand how to use this app effectively.",
-                    ephemeralAnnotation: .openLink(
+                    ephemeralAnnotation: .link(
                         title: "Open...",
                         url: URL(string: "https://flowdown.ai/docs/")!,
                     ),
@@ -77,7 +77,7 @@ extension SettingController.SettingContent.SupportController {
                     icon: "envelope",
                     title: "Email",
                     explain: "Send us an email.",
-                    ephemeralAnnotation: .openLink(
+                    ephemeralAnnotation: .link(
                         title: "Open...",
                         url: URL(string: "mailto:flowdownapp@qaq.wiki")!,
                     ),
@@ -86,7 +86,7 @@ extension SettingController.SettingContent.SupportController {
                     icon: "safari",
                     title: "\("GitHub")",
                     explain: "Leave a message on GitHub issue.",
-                    ephemeralAnnotation: .openLink(
+                    ephemeralAnnotation: .link(
                         title: "Open...",
                         url: URL(string: "https://github.com/Lakr233/FlowDown/issues")!,
                     ),
@@ -95,7 +95,7 @@ extension SettingController.SettingContent.SupportController {
                     icon: "bubble.left",
                     title: "\("Discord")",
                     explain: "Join our Discord server.",
-                    ephemeralAnnotation: .openLink(
+                    ephemeralAnnotation: .link(
                         title: "Open...",
                         url: URL(string: "https://discord.gg/UHKMRyJcgc")!,
                     ),

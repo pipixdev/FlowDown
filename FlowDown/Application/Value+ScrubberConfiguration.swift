@@ -28,7 +28,7 @@ extension ScrubberConfiguration {
         explain: "Web search will fetch results from Google if enabled.",
         key: googleEnabledKey,
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
     nonisolated(unsafe) static let duckduckgoEnabledConfigurableObject: ConfigurableObject = .init(
         icon: "sparkle.magnifyingglass",
@@ -36,7 +36,7 @@ extension ScrubberConfiguration {
         explain: "Web search will fetch results from Duck Duck Go if enabled.",
         key: duckduckgoEnabledKey,
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
     nonisolated(unsafe) static let yahooEnabledConfigurableObject: ConfigurableObject = .init(
         icon: "sparkle.magnifyingglass",
@@ -44,7 +44,7 @@ extension ScrubberConfiguration {
         explain: "Web search will fetch results from Yahoo if enabled.",
         key: yahooEnabledKey,
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
     nonisolated(unsafe) static let bingEnabledConfigurableObject: ConfigurableObject = .init(
         icon: "sparkle.magnifyingglass",
@@ -52,7 +52,7 @@ extension ScrubberConfiguration {
         explain: "Web search will fetch results from Bing if enabled.",
         key: bingEnabledKey,
         defaultValue: true,
-        annotation: .boolean,
+        annotation: .toggle,
     )
 
     nonisolated(unsafe) static let limitConfigurableObject: ConfigurableObject = .init(
@@ -61,7 +61,7 @@ extension ScrubberConfiguration {
         explain: "The maximum number of search results to fetch.",
         key: limitKey,
         defaultValue: 20,
-        annotation: .list { [
+        annotation: .menu { [
             .init(title: "5 Pages", rawValue: 5),
             .init(title: "10 Pages", rawValue: 10),
             .init(title: "15 Pages", rawValue: 15),

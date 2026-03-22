@@ -55,7 +55,7 @@ class MTURLTool: ModelTool, @unchecked Sendable {
             explain: "Allows LLM to suggest URLs for you to open.",
             key: "wiki.qaq.ModelTools.URLTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

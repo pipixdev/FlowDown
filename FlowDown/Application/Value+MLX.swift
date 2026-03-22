@@ -43,12 +43,12 @@ extension MLX.GPU {
         explain: "Set the strategy for handling runtime resource cache. Allowing the use of cache can speed up inference and save energy, but may cause the software to close unexpectedly.",
         key: storageKey,
         defaultValue: CacheSizeLimit.notAllowed.rawValue,
-        annotation: .list {
+        annotation: .menu {
             CacheSizeLimit.allCases.map { item in
-                ListAnnotation.ValueItem(title: item.title, rawValue: item.rawValue)
+                MenuAnnotation.Option(title: item.title, rawValue: item.rawValue)
             }
         },
-        availabilityRequirement: .init(key: isSupportedKey, match: true, reversed: false),
+        availabilityRequirement: .match(key: isSupportedKey, value: true),
     )
 
     static func subscribeToConfigurableItem() {

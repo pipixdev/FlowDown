@@ -59,7 +59,7 @@ class MTLocationTool: ModelTool, @unchecked Sendable {
             explain: "Allows LLM to access your current location information.",
             key: "wiki.qaq.ModelTools.LocationTool.enabled",
             defaultValue: true,
-            annotation: .boolean,
+            annotation: .toggle,
         )
     }
 

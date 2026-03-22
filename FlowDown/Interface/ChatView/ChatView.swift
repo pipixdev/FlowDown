@@ -57,12 +57,12 @@ class ChatView: UIView {
         return listView
     }
 
-    @BareCodableStorage(key: "Chat.Editor.Model.Name.Style", defaultValue: EditorModelNameStyle.trimmed)
+    @TypedStorage(key: "Chat.Editor.Model.Name.Style", defaultValue: EditorModelNameStyle.trimmed)
     var editorModelNameStyle: EditorModelNameStyle {
         didSet { editor.updateModelName() }
     }
 
-    @BareCodableStorage(key: "Chat.Editor.Model.Apply.Default", defaultValue: true)
+    @TypedStorage(key: "Chat.Editor.Model.Apply.Default", defaultValue: true)
     var editorApplyModelToDefault: Bool
 
     let title = TitleBar()
