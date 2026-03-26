@@ -291,12 +291,12 @@ extension ConversationSession {
                     await MemoryExtractor.shared.extractIfNeeded(
                         from: recentMessages,
                         conversationId: convId.description,
-                        using: auxModel
+                        using: auxModel,
                     )
                     await ConversationSummarizer.shared.summarizeIfNeeded(
                         conversationId: convId,
                         messages: allMessages,
-                        using: auxModel
+                        using: auxModel,
                     )
                 }
             }

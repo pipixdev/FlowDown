@@ -22,7 +22,7 @@ final class ConversationSummarizer {
     func summarizeIfNeeded(
         conversationId: Conversation.ID,
         messages: [Message],
-        using modelId: ModelManager.ModelIdentifier?
+        using modelId: ModelManager.ModelIdentifier?,
     ) async {
         guard let modelId else {
             Logger.model.debugFile("[Summarizer] skipping: no model id")
@@ -99,7 +99,7 @@ final class ConversationSummarizer {
             let response = try await ModelManager.shared.infer(
                 with: modelId,
                 maxCompletionTokens: 256,
-                input: inferMessages
+                input: inferMessages,
             )
 
             let raw = response.text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -114,7 +114,7 @@ final class ConversationSummarizer {
                 conversationId: conversationId,
                 summary: summary,
                 topics: topics,
-                messageCount: messages.count
+                messageCount: messages.count,
             )
 
             summarizedThisSession.insert(conversationId)
@@ -133,7 +133,7 @@ final class ConversationSummarizer {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM d"
 
-            var lines: [String] = ["Recent conversation context (for background awareness only):"]
+            var lines = ["Recent conversation context (for background awareness only):"]
             for (index, item) in summaries.enumerated() {
                 let dateStr = dateFormatter.string(from: item.modified)
                 let topicsStr = item.topics.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -182,7 +182,7 @@ final class ConversationSummarizer {
         conversationId: Conversation.ID,
         summary: String,
         topics: String,
-        messageCount: Int
+        messageCount: Int,
     ) throws {
         let storage = try Storage.db()
         if let existing = try storage.getSummary(forConversation: conversationId) {
@@ -193,7 +193,7 @@ final class ConversationSummarizer {
         } else {
             let newSummary = ConversationSummary(
                 deviceId: Storage.deviceId,
-                conversationId: conversationId
+                conversationId: conversationId,
             )
             newSummary.update(\.summary, to: summary)
             newSummary.update(\.topics, to: topics)

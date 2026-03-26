@@ -23,7 +23,7 @@ final class MemoryExtractor {
     func extractIfNeeded(
         from messages: [Message],
         conversationId: String,
-        using modelId: ModelManager.ModelIdentifier?
+        using modelId: ModelManager.ModelIdentifier?,
     ) async {
         guard let modelId else {
             Logger.model.debugFile("MemoryExtractor skipping: no model selected")
@@ -103,7 +103,7 @@ final class MemoryExtractor {
         let response = try await ModelManager.shared.infer(
             with: modelId,
             maxCompletionTokens: 512,
-            input: messages
+            input: messages,
         )
 
         let responseText = response.text.trimmingCharacters(in: .whitespacesAndNewlines)
