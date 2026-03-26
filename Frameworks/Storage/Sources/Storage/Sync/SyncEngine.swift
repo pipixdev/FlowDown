@@ -139,11 +139,16 @@ public final actor SyncEngine: Sendable {
     }
 
     public init(storage: Storage, containerIdentifier: String, mode: Mode, automaticallySync: Bool = true) {
-        let ckContainer = CKContainer(identifier: containerIdentifier)
-        let resolvedContainer: any CloudContainer = if SyncEngine.isCloudSyncSupported, case .mock = mode {
-            MockCloudContainer.createContainer(identifier: containerIdentifier)
+        let liveContainer: CKContainer?
+        let resolvedContainer: any CloudContainer
+        if case .mock = mode {
+            // Avoid touching CKContainer in tests/CI where CloudKit entitlements are intentionally absent.
+            liveContainer = nil
+            resolvedContainer = MockCloudContainer.createContainer(identifier: containerIdentifier)
         } else {
-            ckContainer
+            let ckContainer = CKContainer(identifier: containerIdentifier)
+            liveContainer = ckContainer
+            resolvedContainer = ckContainer
         }
 
         self.storage = storage
@@ -163,7 +168,7 @@ public final actor SyncEngine: Sendable {
                 createSyncEngine = { syncEngine in
                     let stateSerialization = SyncEngine.decodeStateSerialization()
                     var configuration = CKSyncEngine.Configuration(
-                        database: ckContainer.privateCloudDatabase,
+                        database: liveContainer!.privateCloudDatabase,
                         stateSerialization: stateSerialization,
                         delegate: syncEngine,
                     )
