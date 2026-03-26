@@ -29,7 +29,7 @@ public enum SyncPreferences {
     // MARK: - Group Toggles
 
     public enum Group: Sendable {
-        case conversations // Conversation, Message, Attachment
+        case conversations // Conversation, Message, Attachment, ConversationSummary
         case memory // Memory
         case mcp // ModelContextServer
         case models // CloudModel
@@ -65,7 +65,7 @@ public enum SyncPreferences {
     /// Map a table name to the preference group.
     public static func group(forTableName table: String) -> Group? {
         switch table {
-        case Conversation.tableName, Message.tableName, Attachment.tableName:
+        case Conversation.tableName, Message.tableName, Attachment.tableName, ConversationSummary.tableName:
             .conversations
         case Memory.tableName:
             .memory
@@ -95,6 +95,7 @@ public enum SyncPreferences {
             tables.append(Conversation.tableName)
             tables.append(Message.tableName)
             tables.append(Attachment.tableName)
+            tables.append(ConversationSummary.tableName)
         }
 
         if SyncPreferences.isGroupEnabled(.models) {

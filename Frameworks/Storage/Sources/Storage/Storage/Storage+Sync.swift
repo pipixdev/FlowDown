@@ -61,6 +61,8 @@ package extension Storage {
             try handleRemoteDeletedMemory(objectId: objectId, handle: handle)
         case ChatTemplateRecord.tableName:
             try handleRemoteDeletedChatTemplate(objectId: objectId, handle: handle)
+        case ConversationSummary.tableName:
+            try handleRemoteDeletedConversationSummary(objectId: objectId, handle: handle)
         default:
             break
         }
@@ -128,6 +130,15 @@ package extension Storage {
 
         Logger.syncEngine.infoFile("handleRemoteDeletedChatTemplate \(objectId)")
     }
+
+    private func handleRemoteDeletedConversationSummary(objectId: String, handle: Handle) throws {
+        try handle.delete(
+            fromTable: ConversationSummary.tableName,
+            where: ConversationSummary.Properties.objectId == objectId,
+        )
+
+        Logger.syncEngine.infoFile("handleRemoteDeletedConversationSummary \(objectId)")
+    }
 }
 
 package extension Storage {
@@ -174,6 +185,8 @@ package extension Storage {
             try handleRemoteUpsertMemory(serverRecord: serverRecord, handle: handle)
         case ChatTemplateRecord.tableName:
             try handleRemoteUpsertChatTemplate(serverRecord: serverRecord, handle: handle)
+        case ConversationSummary.tableName:
+            try handleRemoteUpsertConversationSummary(serverRecord: serverRecord, handle: handle)
         default:
             break
         }
@@ -444,5 +457,40 @@ package extension Storage {
         }
 
         try? handle.insertOrReplace([remoteObject], intoTable: ChatTemplateRecord.tableName)
+    }
+
+    private func handleRemoteUpsertConversationSummary(serverRecord: CKRecord, handle: Handle) throws {
+        guard let payload = serverRecord.payloadData else {
+            logDecodeFailure(tableName: ConversationSummary.tableName, recordID: serverRecord.recordID, payloadSize: nil)
+            return
+        }
+
+        guard let remoteObject = try? ConversationSummary.decodePayload(payload) else {
+            logDecodeFailure(tableName: ConversationSummary.tableName, recordID: serverRecord.recordID, payloadSize: payload.count)
+            return
+        }
+
+        let localObject: ConversationSummary? = try? handle.getObject(
+            fromTable: ConversationSummary.tableName,
+            where: ConversationSummary.Properties.objectId == remoteObject.objectId,
+        )
+
+        guard let localObject else {
+            try? handle.insertOrReplace([remoteObject], intoTable: ConversationSummary.tableName)
+            return
+        }
+
+        let localMilliseconds = localObject.modified.millisecondsSince1970
+        let lastModifiedMilliseconds = serverRecord.lastModifiedMilliseconds
+        if localMilliseconds == lastModifiedMilliseconds {
+            return
+        }
+
+        if localMilliseconds > lastModifiedMilliseconds {
+            try? pendingUploadEnqueue(sources: [(localObject, .update)], skipEnqueueHandler: true, handle: handle)
+            return
+        }
+
+        try? handle.insertOrReplace([remoteObject], intoTable: ConversationSummary.tableName)
     }
 }

@@ -204,6 +204,18 @@ extension ChatTemplateRecord: Syncable, SyncQueryable {
     }
 }
 
+extension ConversationSummary: Syncable, SyncQueryable {
+    package static let SyncQuery: SyncQueryProperties = .init(objectId: ConversationSummary.Properties.objectId.asProperty(), creation: ConversationSummary.Properties.creation.asProperty(), modified: ConversationSummary.Properties.modified.asProperty(), removed: ConversationSummary.Properties.removed.asProperty())
+
+    package func encodePayload() throws -> Data {
+        try Storage.encodePayloadSyncable(self)
+    }
+
+    package static func decodePayload(_ data: Data) throws -> Self {
+        try Storage.decodePayloadSyncable(Self.self, data)
+    }
+}
+
 package extension Storage {
     struct DiffSyncableResult<T: Syncable> {
         /// 新增的
@@ -550,6 +562,8 @@ package extension Storage {
                 object.realObject = getObject(Attachment.self, objectId: object.objectId, handle: handle)
             case ChatTemplateRecord.tableName:
                 object.realObject = getObject(ChatTemplateRecord.self, objectId: object.objectId, handle: handle)
+            case ConversationSummary.tableName:
+                object.realObject = getObject(ConversationSummary.self, objectId: object.objectId, handle: handle)
             default: continue
             }
         }
@@ -575,6 +589,7 @@ package extension Storage {
                 Attachment.self,
                 Memory.self,
                 ChatTemplateRecord.self,
+                ConversationSummary.self,
             ]
 
             let row = try $0.getRow(on: UploadQueue.Properties.id.max(), fromTable: UploadQueue.tableName)

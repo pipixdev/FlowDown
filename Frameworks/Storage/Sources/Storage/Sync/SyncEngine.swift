@@ -22,6 +22,8 @@ public final actor SyncEngine: Sendable {
     public static let MemoryChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.MemoryChanged")
     /// 模板列表变化通知, 在 MainActor 中发布。可安全的在UI线程中访问
     public static let ChatTemplateChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.ChatTemplateChanged")
+    /// 会话摘要变化通知, 在 MainActor 中发布。可安全的在UI线程中访问
+    public static let ConversationSummaryChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.ConversationSummaryChanged")
     /// 本地数据删除通知, 在 MainActor 中发布。可安全的在UI线程中访问
     public static let LocalDataDeleted: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.LocalDataDeleted")
     /// 云端数据删除通知, 在 MainActor 中发布。可安全的在UI线程中访问
@@ -34,6 +36,7 @@ public final actor SyncEngine: Sendable {
     public static let ModelContextServerNotificationKey: String = "ModelContextServer"
     public static let MemoryNotificationKey: String = "Memory"
     public static let ChatTemplateNotificationKey: String = "ChatTemplate"
+    public static let ConversationSummaryNotificationKey: String = "ConversationSummary"
 
     public nonisolated static let syncEnabledDefaultsKey = "com.flowdown.storage.sync.manually.enabled"
 
@@ -751,6 +754,7 @@ private extension SyncEngine {
         var modificationMCPS: [ModelContextServer.ID] = []
         var modificationMemorys: [Memory.ID] = []
         var modificationTemplates: [ChatTemplateRecord.ID] = []
+        var modificationSummaries: [ConversationSummary.ID] = []
 
         for modification in filteredModifications {
             let recordID = modification.recordID
@@ -767,6 +771,8 @@ private extension SyncEngine {
                 modificationMemorys.append(objectId)
             } else if tableName == ChatTemplateRecord.tableName {
                 modificationTemplates.append(objectId)
+            } else if tableName == ConversationSummary.tableName {
+                modificationSummaries.append(objectId)
             }
         }
 
@@ -776,6 +782,7 @@ private extension SyncEngine {
         var deletedMCPS: [ModelContextServer.ID] = []
         var deletedMemorys: [Memory.ID] = []
         var deletedTemplates: [ChatTemplateRecord.ID] = []
+        var deletedSummaries: [ConversationSummary.ID] = []
         for deletion in filteredDeletions {
             let recordID = deletion.recordID
             guard let (objectId, tableName) = UploadQueue.parseCKRecordID(recordID.recordName) else { continue }
@@ -791,6 +798,8 @@ private extension SyncEngine {
                 deletedMemorys.append(objectId)
             } else if tableName == ChatTemplateRecord.tableName {
                 deletedTemplates.append(objectId)
+            } else if tableName == ConversationSummary.tableName {
+                deletedSummaries.append(objectId)
             }
         }
 
@@ -810,6 +819,7 @@ private extension SyncEngine {
         let MCPNotificationInfo = ModelContextServerNotificationInfo(modifications: modificationMCPS, deletions: deletedMCPS)
         let memoryNotificationInfo = MemoryNotificationInfo(modifications: modificationMemorys, deletions: deletedMemorys)
         let templateNotificationInfo = ChatTemplateNotificationInfo(modifications: modificationTemplates, deletions: deletedTemplates)
+        let summaryNotificationInfo = ConversationSummaryNotificationInfo(modifications: modificationSummaries, deletions: deletedSummaries)
 
         await MainActor.run {
             if !conversationNotificationInfo.isEmpty {
@@ -868,6 +878,16 @@ private extension SyncEngine {
                     object: nil,
                     userInfo: [
                         SyncEngine.ChatTemplateNotificationKey: templateNotificationInfo,
+                    ],
+                )
+            }
+
+            if !summaryNotificationInfo.isEmpty {
+                NotificationCenter.default.post(
+                    name: SyncEngine.ConversationSummaryChanged,
+                    object: nil,
+                    userInfo: [
+                        SyncEngine.ConversationSummaryNotificationKey: summaryNotificationInfo,
                     ],
                 )
             }
