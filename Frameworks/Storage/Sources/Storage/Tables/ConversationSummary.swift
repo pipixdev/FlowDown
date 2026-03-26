@@ -11,6 +11,10 @@ import WCDBSwift
 public final class ConversationSummary: Identifiable, Codable, TableNamed, DeviceOwned, TableCodable {
     public static let tableName: String = "ConversationSummary"
 
+    static func objectId(forConversationID conversationId: String) -> String {
+        "conversation-summary-\(conversationId)"
+    }
+
     public var id: String {
         objectId
     }
@@ -57,6 +61,7 @@ public final class ConversationSummary: Identifiable, Codable, TableNamed, Devic
     }
 
     public init(deviceId: String, conversationId: String) {
+        objectId = Self.objectId(forConversationID: conversationId)
         self.deviceId = deviceId
         self.conversationId = conversationId
     }

@@ -10,15 +10,19 @@ import WCDBSwift
 
 public extension Storage {
     func insertOrUpdateSummary(_ summary: ConversationSummary) throws {
-        let existingObject: ConversationSummary? = try db.getObject(
-            fromTable: ConversationSummary.tableName,
-            where: ConversationSummary.Properties.objectId == summary.objectId,
-        )
+        try runTransaction { [weak self] handle in
+            guard let self else { return }
 
-        try db.insertOrReplace([summary], intoTable: ConversationSummary.tableName)
+            let existingObject: ConversationSummary? = try handle.getObject(
+                fromTable: ConversationSummary.tableName,
+                where: ConversationSummary.Properties.objectId == summary.objectId,
+            )
 
-        let changes: UploadQueue.Changes = existingObject != nil ? .update : .insert
-        try pendingUploadEnqueue(sources: [(summary, changes)])
+            try handle.insertOrReplace([summary], intoTable: ConversationSummary.tableName)
+
+            let changes: UploadQueue.Changes = existingObject != nil ? .update : .insert
+            try pendingUploadEnqueue(sources: [(summary, changes)], handle: handle)
+        }
     }
 
     func getSummary(forConversation conversationId: String) throws -> ConversationSummary? {
@@ -39,22 +43,27 @@ public extension Storage {
     }
 
     func deleteSummary(forConversation conversationId: String) throws {
-        let existingObject: ConversationSummary? = try db.getObject(
-            fromTable: ConversationSummary.tableName,
-            where: ConversationSummary.Properties.conversationId == conversationId
-                && ConversationSummary.Properties.removed == false,
-        )
+        try runTransaction { [weak self] handle in
+            guard let self else { return }
 
-        let modified = Date.now
-        let update = StatementUpdate().update(table: ConversationSummary.tableName)
-            .set(ConversationSummary.Properties.removed).to(true)
-            .set(ConversationSummary.Properties.modified).to(modified)
-            .where(ConversationSummary.Properties.conversationId == conversationId)
-        try db.exec(update)
+            let existingObject: ConversationSummary? = try handle.getObject(
+                fromTable: ConversationSummary.tableName,
+                where: ConversationSummary.Properties.conversationId == conversationId
+                    && ConversationSummary.Properties.removed == false,
+            )
 
-        if let existingObject {
-            existingObject.markModified(modified)
-            try pendingUploadEnqueue(sources: [(existingObject, .delete)])
+            let modified = Date.now
+            let update = StatementUpdate().update(table: ConversationSummary.tableName)
+                .set(ConversationSummary.Properties.removed).to(true)
+                .set(ConversationSummary.Properties.modified).to(modified)
+                .where(ConversationSummary.Properties.conversationId == conversationId)
+            try handle.exec(update)
+
+            if let existingObject {
+                existingObject.removed = true
+                existingObject.markModified(modified)
+                try pendingUploadEnqueue(sources: [(existingObject, .delete)], handle: handle)
+            }
         }
     }
 }
