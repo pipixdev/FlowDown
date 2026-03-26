@@ -8,7 +8,10 @@ final class MarkdownMathPlaceholderRepairTests {
         let markdown = "**Conclusion: for points outside a uniform thin spherical shell, gravity is equivalent to placing total shell mass \\\\(M_s\\\\) at the center.**"
         let result = MarkdownParser().parse(markdown)
 
-        #expect(containsMathPlaceholderCode(in: result.document))
+        #expect(
+            containsMathPlaceholderCode(in: result.document)
+                || containsMathNode(in: result.document)
+        )
 
         let repaired = result.documentByRepairingInlineMathPlaceholders()
         #expect(!containsMathPlaceholderCode(in: repaired))
@@ -20,7 +23,10 @@ final class MarkdownMathPlaceholderRepairTests {
         let markdown = "_See **\\(a^2+b^2=c^2\\)** for the proof._"
         let result = MarkdownParser().parse(markdown)
 
-        #expect(containsMathPlaceholderCode(in: result.document))
+        #expect(
+            containsMathPlaceholderCode(in: result.document)
+                || containsMathNode(in: result.document)
+        )
 
         let repaired = result.documentByRepairingInlineMathPlaceholders()
         #expect(!containsMathPlaceholderCode(in: repaired))

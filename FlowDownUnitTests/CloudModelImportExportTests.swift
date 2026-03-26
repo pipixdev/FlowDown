@@ -13,6 +13,7 @@ import Foundation
 @testable import Storage
 import Testing
 
+@Suite(.serialized)
 struct ImportExportRoundTripSuite {
     private func ensureEnvironment() throws {
         if AppEnvironment.isBootstrapped {
@@ -55,10 +56,15 @@ struct ImportExportRoundTripSuite {
         // Ensure a clean slate.
         #expect(sdb.cloudModelList().isEmpty)
 
+        let uniqueObjectID = "test-object-id-\(UUID().uuidString)"
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CloudModelRoundTrip-\(UUID().uuidString)")
+            .appendingPathExtension(ModelManager.flowdownModelConfigurationExtension)
+
         // Create a model with enough fields to catch partial imports.
         let original = CloudModel(
             deviceId: Storage.deviceId,
-            objectId: "test-object-id",
+            objectId: uniqueObjectID,
             model_identifier: "test-scope/test-model",
             model_list_endpoint: "$INFERENCE_ENDPOINT$/../../models",
             creation: Date(timeIntervalSince1970: 1_735_000_000),
@@ -79,10 +85,6 @@ struct ImportExportRoundTripSuite {
         #expect(sdb.cloudModelList().count == 1)
 
         // Export to .fdmodel (plist XML), mimicking the app's export.
-        let fileURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("CloudModelRoundTrip")
-            .appendingPathExtension(ModelManager.flowdownModelConfigurationExtension)
-
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .xml
         let exported = try encoder.encode(original)
@@ -122,6 +124,8 @@ struct ImportExportRoundTripSuite {
 
         #expect(MCPService.shared.servers.value.isEmpty)
 
+        let uniqueObjectID = "test-mcp-object-id-\(UUID().uuidString)"
+
         let original = ModelContextServer(
             name: "Test MCP",
             comment: "test-comment",
@@ -131,7 +135,7 @@ struct ImportExportRoundTripSuite {
             timeout: 15,
             isEnabled: true,
         )
-        original.update(\.objectId, to: "test-mcp-object-id")
+        original.update(\.objectId, to: uniqueObjectID)
         MCPService.shared.insert(original)
         #expect(MCPService.shared.servers.value.count == 1)
 
@@ -164,12 +168,16 @@ struct ImportExportRoundTripSuite {
 
         #expect(ChatTemplateManager.shared.templates.isEmpty)
 
-        var original = ChatTemplate()
-        original.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
-        original.name = "Test Template"
-        original.prompt = "You are a helpful assistant."
-        original.inheritApplicationPrompt = false
-        original.avatar = Data([0x01, 0x02, 0x03])
+        let originalID = UUID()
+        let original: ChatTemplate = {
+            var template = ChatTemplate()
+            template.id = originalID
+            template.name = "Test Template"
+            template.prompt = "You are a helpful assistant."
+            template.inheritApplicationPrompt = false
+            template.avatar = Data([0x01, 0x02, 0x03])
+            return template
+        }()
 
         await MainActor.run {
             ChatTemplateManager.shared.addTemplate(original)
@@ -179,7 +187,7 @@ struct ImportExportRoundTripSuite {
         let exported = try ChatTemplateManager.shared.exportTemplateData(original)
 
         await MainActor.run {
-            ChatTemplateManager.shared.remove(for: original.id)
+            ChatTemplateManager.shared.remove(for: originalID)
         }
         #expect(ChatTemplateManager.shared.templates.isEmpty)
 
