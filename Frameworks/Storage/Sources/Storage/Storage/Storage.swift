@@ -275,6 +275,7 @@ public extension Storage {
                         Memory.tableName,
                         ModelContextServer.tableName,
                         ChatTemplateRecord.tableName,
+                        ConversationSummary.tableName,
                     ]
 
                     // 清理上传队列

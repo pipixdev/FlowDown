@@ -10,7 +10,15 @@ import WCDBSwift
 
 public extension Storage {
     func insertOrUpdateSummary(_ summary: ConversationSummary) throws {
+        let existingObject: ConversationSummary? = try db.getObject(
+            fromTable: ConversationSummary.tableName,
+            where: ConversationSummary.Properties.objectId == summary.objectId,
+        )
+
         try db.insertOrReplace([summary], intoTable: ConversationSummary.tableName)
+
+        let changes: UploadQueue.Changes = existingObject != nil ? .update : .insert
+        try pendingUploadEnqueue(sources: [(summary, changes)])
     }
 
     func getSummary(forConversation conversationId: String) throws -> ConversationSummary? {
@@ -31,11 +39,22 @@ public extension Storage {
     }
 
     func deleteSummary(forConversation conversationId: String) throws {
+        let existingObject: ConversationSummary? = try db.getObject(
+            fromTable: ConversationSummary.tableName,
+            where: ConversationSummary.Properties.conversationId == conversationId
+                && ConversationSummary.Properties.removed == false,
+        )
+
         let modified = Date.now
         let update = StatementUpdate().update(table: ConversationSummary.tableName)
             .set(ConversationSummary.Properties.removed).to(true)
             .set(ConversationSummary.Properties.modified).to(modified)
             .where(ConversationSummary.Properties.conversationId == conversationId)
         try db.exec(update)
+
+        if let existingObject {
+            existingObject.markModified(modified)
+            try pendingUploadEnqueue(sources: [(existingObject, .delete)])
+        }
     }
 }

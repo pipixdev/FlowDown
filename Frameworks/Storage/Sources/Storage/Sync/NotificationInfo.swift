@@ -84,3 +84,16 @@ public final class ChatTemplateNotificationInfo: Sendable {
         self.deletions = deletions
     }
 }
+
+public final class ConversationSummaryNotificationInfo: Sendable {
+    public let modifications: [ConversationSummary.ID]
+    public let deletions: [ConversationSummary.ID]
+    public var isEmpty: Bool {
+        modifications.isEmpty && deletions.isEmpty
+    }
+
+    public init(modifications: [ConversationSummary.ID], deletions: [ConversationSummary.ID]) {
+        self.modifications = modifications
+        self.deletions = deletions
+    }
+}
