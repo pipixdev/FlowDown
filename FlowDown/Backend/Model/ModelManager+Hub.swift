@@ -9,10 +9,65 @@ import Combine
 import CryptoKit
 import Digger
 import Foundation
-import Hub
 import Storage
 
-private let api = HubApi()
+private let huggingFaceAPI = HuggingFaceAPI()
+
+struct HuggingFaceRepository: Sendable {
+    let id: String
+}
+
+struct HuggingFaceRepositoryFile: Decodable, Sendable {
+    let type: String
+    let size: UInt64?
+    let path: String
+
+    var isFile: Bool {
+        type == "file"
+    }
+}
+
+enum HuggingFaceAPIError: LocalizedError {
+    case invalidRepositoryIdentifier(String)
+    case invalidResponse
+
+    var errorDescription: String? {
+        switch self {
+        case let .invalidRepositoryIdentifier(identifier):
+            "Invalid Hugging Face repository identifier: \(identifier)"
+        case .invalidResponse:
+            "Hugging Face returned an invalid response."
+        }
+    }
+}
+
+struct HuggingFaceAPI: Sendable {
+    func getFiles(from repository: HuggingFaceRepository) async throws -> [HuggingFaceRepositoryFile] {
+        let identifier = repository.id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+        guard let identifier else {
+            throw HuggingFaceAPIError.invalidRepositoryIdentifier(repository.id)
+        }
+        guard let url = URL(string: "https://huggingface.co/api/models/\(identifier)/tree/main?recursive=1") else {
+            throw HuggingFaceAPIError.invalidRepositoryIdentifier(repository.id)
+        }
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let response = response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode) else {
+            throw HuggingFaceAPIError.invalidResponse
+        }
+        return try decodeFiles(from: data)
+    }
+
+    func decodeFiles(from data: Data) throws -> [HuggingFaceRepositoryFile] {
+        let entries = try JSONDecoder().decode([HuggingFaceRepositoryFile].self, from: data)
+        return entries.filter(\.isFile)
+    }
+
+    func totalSize(of files: [HuggingFaceRepositoryFile]) -> UInt64 {
+        files.reduce(into: UInt64(0)) { partialResult, file in
+            partialResult += file.size ?? 0
+        }
+    }
+}
 
 extension ModelManager {
     class HubDownloadProgress: ObservableObject, Equatable, Hashable {
@@ -132,23 +187,9 @@ extension ModelManager {
 
 extension ModelManager {
     func checkModelSizeFromHugginFace(identifier: String) async throws -> UInt64 {
-        let repo = Hub.Repo(id: identifier, type: .models)
-        let filenames = try await api.getFilenames(from: repo, matching: [])
-        var totalSize = UInt64(0)
-        for filename in filenames where !Task.isCancelled {
-            let remoteURL = URL(string: "https://huggingface.co")!
-                .appendingPathComponent(repo.id)
-                .appendingPathComponent("resolve")
-                .appendingPathComponent("main")
-                .appendingPathComponent(filename)
-            var request = URLRequest(url: remoteURL)
-            request.httpMethod = "HEAD"
-            let (_, resp) = try await URLSession.shared.data(for: request)
-            let size = resp.expectedContentLength
-            guard size > 0 else { continue }
-            totalSize += UInt64(size)
-        }
-        return totalSize
+        let repo = HuggingFaceRepository(id: identifier)
+        let files = try await huggingFaceAPI.getFiles(from: repo)
+        return huggingFaceAPI.totalSize(of: files)
     }
 
     @discardableResult
@@ -158,7 +199,7 @@ extension ModelManager {
     ) async throws -> LocalModel {
         assert(!Thread.isMainThread)
 
-        let repo = Hub.Repo(id: identifier, type: .models)
+        let repo = HuggingFaceRepository(id: identifier)
 
         // prepare temp directories structure
         let modelTempDir = tempDirForDownloadLocalModel(model_identifier: identifier)
@@ -178,29 +219,20 @@ extension ModelManager {
 
         Logger.model.infoFile("downloading manifest for \(identifier)...")
 
-        let filenames = try await api.getFilenames(from: repo, matching: [])
-        progress.acquiredFileList(filenames)
+        let files = try await huggingFaceAPI.getFiles(from: repo)
+        progress.acquiredFileList(files.map(\.path))
 
         await MainActor.run { progress.cancellable = true }
 
-        for filename in filenames {
+        for file in files {
             try progress.checkContinue()
-            let remoteURL = URL(string: "https://huggingface.co")!
-                .appendingPathComponent(repo.id)
-                .appendingPathComponent("resolve")
-                .appendingPathComponent("main")
-                .appendingPathComponent(filename)
-            var request = URLRequest(url: remoteURL)
-            request.httpMethod = "HEAD"
-            progress.progressOnFile(filename, progress: .init(totalUnitCount: 100))
-            let (_, resp) = try await URLSession.shared.data(for: request)
-            let size = resp.expectedContentLength
-            progress.progressOnFile(filename, progress: .init(totalUnitCount: size))
+            progress.progressOnFile(file.path, progress: .init(totalUnitCount: Int64(file.size ?? 0)))
         }
 
-        for filename in filenames {
+        for file in files {
             try progress.checkContinue()
 
+            let filename = file.path
             let dest = contentDir.appendingPathComponent(filename)
             defer {
                 let size = (try? FileManager.default.attributesOfItem(atPath: dest.path)[.size] as? Int64) ?? 0
