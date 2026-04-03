@@ -15,16 +15,16 @@ let package = Package(
     products: [
         .library(
             name: "FlowDownModelExchange",
-            targets: ["FlowDownModelExchange"],
+            targets: ["FlowDownModelExchange"]
         ),
     ],
     targets: [
         .target(
-            name: "FlowDownModelExchange",
+            name: "FlowDownModelExchange"
         ),
         .testTarget(
             name: "FlowDownModelExchangeTests",
-            dependencies: ["FlowDownModelExchange"],
+            dependencies: ["FlowDownModelExchange"]
         ),
-    ],
+    ]
 )

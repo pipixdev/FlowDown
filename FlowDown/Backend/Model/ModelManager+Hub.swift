@@ -13,11 +13,11 @@ import Storage
 
 private let huggingFaceAPI = HuggingFaceAPI()
 
-struct HuggingFaceRepository: Sendable {
+struct HuggingFaceRepository {
     let id: String
 }
 
-struct HuggingFaceRepositoryFile: Decodable, Sendable {
+struct HuggingFaceRepositoryFile: Decodable {
     let type: String
     let size: UInt64?
     let path: String
@@ -41,7 +41,7 @@ enum HuggingFaceAPIError: LocalizedError {
     }
 }
 
-struct HuggingFaceAPI: Sendable {
+struct HuggingFaceAPI {
     func getFiles(from repository: HuggingFaceRepository) async throws -> [HuggingFaceRepositoryFile] {
         let identifier = repository.id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
         guard let identifier else {

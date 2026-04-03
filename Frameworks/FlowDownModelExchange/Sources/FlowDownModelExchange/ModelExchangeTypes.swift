@@ -131,7 +131,7 @@ public nonisolated struct ModelExchangeRequestBuilder: Sendable {
         reason: String,
         capabilities: [ModelExchangeCapability],
         multipleSelection: Bool,
-        timestamp: Date = .init(),
+        timestamp: Date = .init()
     ) throws -> ModelExchangeSignedRequest {
         var components = URLComponents()
         components.scheme = flowdownScheme

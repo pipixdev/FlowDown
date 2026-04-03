@@ -29,7 +29,7 @@ public extension Storage {
         try db.getObject(
             fromTable: ConversationSummary.tableName,
             where: ConversationSummary.Properties.conversationId == conversationId
-                && ConversationSummary.Properties.removed == false
+                && ConversationSummary.Properties.removed == false,
         )
     }
 
@@ -38,7 +38,7 @@ public extension Storage {
             fromTable: ConversationSummary.tableName,
             where: ConversationSummary.Properties.removed == false,
             orderBy: [ConversationSummary.Properties.modified.order(.descending)],
-            limit: limit
+            limit: limit,
         )
     }
 
