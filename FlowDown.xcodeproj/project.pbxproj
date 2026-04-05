@@ -1111,7 +1111,7 @@
 			repositoryURL = "https://github.com/Lakr233/ScrubberKit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.1;
+				minimumVersion = 0.2.0;
 			};
 		};
 		50014D7C2D8A996300C10932 /* XCRemoteSwiftPackageReference "AlertController" */ = {

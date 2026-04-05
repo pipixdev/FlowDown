@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/ScrubberKit",
       "state" : {
-        "revision" : "a2c801853e2772c76a17210a4d8fb4f6b55af5e1",
-        "version" : "0.1.1"
+        "revision" : "b69932dc44461dd4a73aafeb78d514222f68d3e1",
+        "version" : "0.2.0"
       }
     },
     {
