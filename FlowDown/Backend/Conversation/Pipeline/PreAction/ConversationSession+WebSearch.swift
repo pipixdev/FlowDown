@@ -201,7 +201,9 @@ extension ConversationSessionManager.Session {
                     return
                 }
 
-                let eachLimit = Int(max(3, ScrubberConfiguration.limitConfigurableObjectValue / searchQueries.count))
+                let eachLimit = await MainActor.run {
+                    Int(max(3, ScrubberConfiguration.limitConfigurableObjectValue / searchQueries.count))
+                }
                 Logger.network.infoFile("web search has limited \(eachLimit) for each query")
 
                 var phase = WebSearchPhase()
@@ -236,7 +238,9 @@ extension ConversationSessionManager.Session {
                         }
                     } onCancel: {
                         Logger.network.errorFile("cancelling web search due to task is cancelled")
-                        scrubber.cancel()
+                        Task { @MainActor in
+                            scrubber.cancel()
+                        }
                     }
                 }
 

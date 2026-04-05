@@ -233,9 +233,14 @@ class ModelToolsManager {
             var audioAttachments: [ToolResultContents.Attachment] = []
             for content in value {
                 switch content {
-                case let .text(string):
+                case let .text(text: string, annotations: _, _meta: _):
                     textContent.append(string)
-                case let .image(dataString, mimeType, metadata):
+                case let .image(
+                    data: dataString,
+                    mimeType: mimeType,
+                    annotations: _,
+                    _meta: metadata
+                ):
                     var name = metadata?["name"] as? String ?? ""
                     if name.isEmpty {
                         name = String(localized: "Tool Provided Image")
@@ -251,7 +256,12 @@ class ModelToolsManager {
                     } else {
                         Logger.model.errorFile("failed to parse image data from string")
                     }
-                case let .audio(dataString, mimeType):
+                case let .audio(
+                    data: dataString,
+                    mimeType: mimeType,
+                    annotations: _,
+                    _meta: _
+                ):
                     var name = String(localized: "Tool Provided Audio")
                     if !mimeType.isEmpty {
                         name += " " + mimeType
@@ -266,10 +276,10 @@ class ModelToolsManager {
                     } else {
                         Logger.model.errorFile("failed to parse audio data from string")
                     }
-                case let .resource(uri, mimeType, text):
-                    let textValue = if let text { String(describing: text) } else { "" }
-                    let mimeTypeValue = if let mimeType { String(describing: mimeType) } else { "" }
-                    textContent.append("[\(textValue) \(mimeTypeValue)](\(uri))")
+                case let .resource(resource, annotations: _, _meta: _):
+                    let textValue = resource.text ?? resource.blob ?? ""
+                    let mimeTypeValue = resource.mimeType ?? ""
+                    textContent.append("[\(textValue) \(mimeTypeValue)](\(resource.uri))")
                 case let .resourceLink(
                     uri: uri,
                     name: name,

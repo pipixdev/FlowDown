@@ -220,9 +220,10 @@ final class EvaluationStatusController: UIViewController {
     }
 
     private func updateFilterIcon() {
-        if outcomeFilter == nil {
+        switch outcomeFilter {
+        case nil:
             filterBarItem.image = .init(systemName: "line.3.horizontal.decrease.circle")
-        } else {
+        case .some:
             filterBarItem.image = .init(systemName: "line.3.horizontal.decrease.circle.fill")
         }
     }
