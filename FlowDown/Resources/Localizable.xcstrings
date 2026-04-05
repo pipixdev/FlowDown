@@ -4236,6 +4236,7 @@
       }
     },
     "Ask Model + Image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5110,7 +5111,6 @@
       }
     },
     "Bahasa Indonesia" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5118,7 +5118,8 @@
             "value" : "Bahasa Indonesia"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Balanced" : {
       "comment" : "Search Strategy",
@@ -7376,6 +7377,7 @@
       }
     },
     "Classify + Image" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13678,7 +13680,6 @@
       }
     },
     "Deutsch" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -13686,7 +13687,8 @@
             "value" : "Deutsch"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Device Not Eligible" : {
       "localizations" : {
@@ -16404,7 +16406,6 @@
       }
     },
     "English (UK)" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16412,10 +16413,10 @@
             "value" : "English (UK)"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "English (US)" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16423,7 +16424,8 @@
             "value" : "English (US)"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Enter a keyword to search for in your conversations. Leave empty to return recent conversations." : {
       "localizations" : {
@@ -16748,7 +16750,6 @@
       }
     },
     "Español (España)" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16756,7 +16757,8 @@
             "value" : "Español (España)"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Essential" : {
       "comment" : "Search Strategy",
@@ -20994,7 +20996,6 @@
       }
     },
     "Français" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -21002,7 +21003,8 @@
             "value" : "Français"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Freezing @ 0.0" : {
       "localizations" : {
@@ -25331,7 +25333,6 @@
       }
     },
     "Italiano" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -25339,7 +25340,8 @@
             "value" : "Italiano"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "JavaScript/TypeScript Capabilities" : {
       "localizations" : {
@@ -25665,16 +25667,16 @@
     },
     "Language" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sprache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
           }
         },
         "es" : {
@@ -30407,7 +30409,6 @@
       }
     },
     "Nederlands" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -30415,7 +30416,8 @@
             "value" : "Nederlands"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Network" : {
       "localizations" : {
@@ -35251,7 +35253,6 @@
       }
     },
     "Polski" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -35259,10 +35260,10 @@
             "value" : "Polski"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Português (Brasil)" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -35270,7 +35271,8 @@
             "value" : "Português (Brasil)"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Postal Code: %@" : {
       "localizations" : {
@@ -44755,16 +44757,16 @@
     },
     "Target Language" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Target Language"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zielsprache"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Target Language"
           }
         },
         "es" : {
@@ -48894,7 +48896,6 @@
       }
     },
     "Tiếng Việt" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -48902,7 +48903,8 @@
             "value" : "Tiếng Việt"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Time Zone: %@" : {
       "localizations" : {
@@ -50425,16 +50427,16 @@
     },
     "Translate" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate"
           }
         },
         "es" : {
@@ -50471,16 +50473,16 @@
     },
     "Translate ${text} into ${targetLanguage}" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate ${text} into ${targetLanguage}"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "${text} in ${targetLanguage} übersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate ${text} into ${targetLanguage}"
           }
         },
         "es" : {
@@ -50517,16 +50519,16 @@
     },
     "Translate ${text} into ${targetLanguage} using the default model" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate ${text} into ${targetLanguage} using the default model"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "${text} mit dem Standardmodell in ${targetLanguage} übersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate ${text} into ${targetLanguage} using the default model"
           }
         },
         "es" : {
@@ -50563,16 +50565,16 @@
     },
     "Translate Text" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate Text"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Text übersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate Text"
           }
         },
         "es" : {
@@ -50609,16 +50611,16 @@
     },
     "Translate text into a target language using a selected model." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate text into a target language using a selected model."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Text mit einem ausgewählten Modell in eine Zielsprache übersetzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate text into a target language using a selected model."
           }
         },
         "es" : {
@@ -50655,16 +50657,16 @@
     },
     "Translation" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translation"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Übersetzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation"
           }
         },
         "es" : {
@@ -50839,7 +50841,6 @@
       }
     },
     "Türkçe" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -50847,7 +50848,8 @@
             "value" : "Türkçe"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Turning off sync only pauses future updates. Existing data stays in place. Re‑enable later to fetch and resume syncing." : {
       "localizations" : {
@@ -56509,16 +56511,16 @@
     },
     "What text should be translated?" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What text should be translated?"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Welcher Text soll übersetzt werden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What text should be translated?"
           }
         },
         "es" : {
@@ -57704,7 +57706,6 @@
       }
     },
     "Русский" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57712,10 +57713,10 @@
             "value" : "Русский"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Українська" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57723,10 +57724,10 @@
             "value" : "Українська"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "العربية" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57734,10 +57735,10 @@
             "value" : "العربية"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "हिन्दी" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57745,10 +57746,10 @@
             "value" : "हिन्दी"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "ไทย" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57756,10 +57757,10 @@
             "value" : "ไทย"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "한국어" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57767,10 +57768,10 @@
             "value" : "한국어"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "日本語" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57778,10 +57779,10 @@
             "value" : "日本語"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "简体中文" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57789,10 +57790,10 @@
             "value" : "简体中文"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "繁體中文" : {
-      "shouldTranslate" : false,
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -57800,7 +57801,8 @@
             "value" : "繁體中文"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     }
   },
   "version" : "1.0"

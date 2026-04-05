@@ -216,26 +216,28 @@ extension ConversationSessionManager.Session {
                     phase.numberOfWebsites = 0
                     phase.proccessProgress = 0.1
                     cont.yield(phase)
+                    let basePhase = phase
                     let urlsReranker = URLsReranker(question: searchQuery, keepKPerHostname: 4)
                     let scrubber = Scrubber(query: searchQuery, options: .init(urlsReranker: urlsReranker))
                     await withTaskCancellationHandler {
-                        await withCheckedContinuation { innerCont in
+                        let docs: [Scrubber.Document] = await withCheckedContinuation { innerCont in
                             Task { @MainActor in
                                 scrubber.run(limitation: eachLimit) { docs in
-                                    results.append(contentsOf: docs)
-                                    innerCont.resume()
+                                    innerCont.resume(returning: docs)
                                 } onProgress: { overall in
                                     let searchCompleted = scrubber.progress.engineStatusCompletedCount
                                     let searchTotal = scrubber.progress.engineStatus.count
                                     let websiteTotal = scrubber.progress.fetchedStatus.count
-                                    phase.proccessProgress = max(0.1, overall.fractionCompleted)
-                                    phase.currentSource = searchCompleted
-                                    phase.numberOfSource = searchTotal
-                                    phase.numberOfWebsites = websiteTotal
-                                    cont.yield(phase)
+                                    var progressPhase = basePhase
+                                    progressPhase.proccessProgress = max(0.1, overall.fractionCompleted)
+                                    progressPhase.currentSource = searchCompleted
+                                    progressPhase.numberOfSource = searchTotal
+                                    progressPhase.numberOfWebsites = websiteTotal
+                                    cont.yield(progressPhase)
                                 }
                             }
                         }
+                        results.append(contentsOf: docs)
                     } onCancel: {
                         Logger.network.errorFile("cancelling web search due to task is cancelled")
                         Task { @MainActor in

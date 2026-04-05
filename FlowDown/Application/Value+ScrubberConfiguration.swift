@@ -10,6 +10,7 @@ import ConfigurableKit
 import Foundation
 import ScrubberKit
 
+nonisolated(unsafe)
 extension ScrubberConfiguration {
     static let googleEnabledKey = "app.scrubber.engine.google.enabled"
     static let duckduckgoEnabledKey = "app.scrubber.engine.duckduckgo.enabled"
@@ -74,6 +75,7 @@ extension ScrubberConfiguration {
         ConfigurableKit.value(forKey: limitKey) ?? 20
     }
 
+    @MainActor
     static func subscribeToConfigurableItem() {
         assert(cancellables.isEmpty)
 
