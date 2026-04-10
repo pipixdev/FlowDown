@@ -25,6 +25,11 @@ final class MemoryExtractor {
         conversationId: String,
         using modelId: ModelManager.ModelIdentifier?,
     ) async {
+        guard ModelToolsManager.shared.canStoreMemory else {
+            Logger.model.debugFile("MemoryExtractor skipping: store memory is disabled")
+            return
+        }
+
         guard let modelId else {
             Logger.model.debugFile("MemoryExtractor skipping: no model selected")
             return

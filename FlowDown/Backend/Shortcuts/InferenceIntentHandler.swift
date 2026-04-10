@@ -73,7 +73,13 @@ enum InferenceIntentHandler {
 
         var proactiveMemoryProvided = false
         var memoryWritingTools: [ModelTool] = []
-        if options.enableMemory {
+        let enabledTools = ModelToolsManager.shared.enabledTools
+        let shouldExposeMemory = ModelToolsManager.shouldExposeMemory(
+            modelWillExecuteTools: options.enableMemory,
+            enabledTools: enabledTools,
+        )
+
+        if shouldExposeMemory {
             if let memoryContext = await MemoryStore.shared.formattedProactiveMemoryContext(),
                !memoryContext.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             {
@@ -160,7 +166,7 @@ enum InferenceIntentHandler {
             }
         }
 
-        if options.enableMemory,
+        if shouldExposeMemory,
            modelCapabilities.contains(.tool),
            !memoryWritingTools.isEmpty,
            !toolRequests.isEmpty
@@ -417,16 +423,7 @@ enum InferenceIntentHandler {
     }
 
     private static func allWritingMemoryTools() -> [ModelTool] {
-        ModelToolsManager.shared.tools.filter { tool in
-            switch tool {
-            case is MTStoreMemoryTool,
-                 is MTUpdateMemoryTool,
-                 is MTDeleteMemoryTool:
-                tool.isEnabled
-            default:
-                false
-            }
-        }
+        ModelToolsManager.shared.enabledMemoryWritingTools
     }
 
     private static func executeMemoryWritingToolCalls(_ toolCalls: [ToolRequest], using tools: [ModelTool]) async {

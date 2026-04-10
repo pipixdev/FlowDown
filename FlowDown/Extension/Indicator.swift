@@ -45,7 +45,7 @@ enum Indicator {
     typealias CompletionCallback = (CompletionDismissRequest) async -> Void
     typealias ExecutionWithCompletion = (CompletionCallback) async throws -> Void
     typealias ProgressCallback = @MainActor (String) -> Void
-    typealias ExecutionWithProgressCompletion = (ProgressCallback, CompletionCallback) async throws -> Void
+    typealias ExecutionWithProgressCompletion = (@escaping ProgressCallback, CompletionCallback) async throws -> Void
 
     static func progress(
         title: String.LocalizationValue,
@@ -107,7 +107,7 @@ enum Indicator {
     private static func runProgressTask(
         on controller: UIViewController,
         alert: AlertProgressIndicatorViewController,
-        operation: @escaping @Sendable (ProgressCallback, CompletionCallback) async throws -> Void
+        operation: @escaping @Sendable (@escaping ProgressCallback, CompletionCallback) async throws -> Void,
     ) async {
         var capturedError: Error?
         let progress: ProgressCallback = { message in

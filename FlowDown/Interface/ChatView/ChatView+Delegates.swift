@@ -266,14 +266,7 @@ extension ChatView: RichEditorView.Delegate {
             }
         }
 
-        let memoryTools = ModelToolsManager.shared.tools.filter { tool in
-            false
-                || tool is MTStoreMemoryTool
-                || tool is MTRecallMemoryTool
-                || tool is MTListMemoriesTool
-                || tool is MTUpdateMemoryTool
-                || tool is MTDeleteMemoryTool
-        }
+        let memoryTools = ModelToolsManager.shared.memoryTools
         let memoryToolsHasOneEnabled = memoryTools.contains { $0.isEnabled }
 
         let builtin: [UIAction] = [

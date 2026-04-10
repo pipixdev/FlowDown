@@ -27,7 +27,7 @@ public nonisolated enum ModelExchangeCrypto {
     public nonisolated static func encrypt(
         _ data: Data,
         for peer: ModelExchangePublicKey,
-        session: String
+        session: String,
     ) throws -> ModelExchangeEncryptedPayload {
         guard let agreementKey = peer.agreementKey else { throw URLError(.cannotDecodeContentData) }
         let ephemeral = Curve25519.KeyAgreement.PrivateKey()
@@ -37,13 +37,13 @@ public nonisolated enum ModelExchangeCrypto {
         return .init(
             session: session,
             sealed: sealedBox.combined.base64EncodedString(),
-            ephemeralPublicKey: ephemeral.publicKey.rawRepresentation.base64EncodedString()
+            ephemeralPublicKey: ephemeral.publicKey.rawRepresentation.base64EncodedString(),
         )
     }
 
     public nonisolated static func decrypt(
         _ payload: ModelExchangeEncryptedPayload,
-        with keyPair: ModelExchangeKeyPair
+        with keyPair: ModelExchangeKeyPair,
     ) throws -> Data {
         guard let sealedData = Data(base64Encoded: payload.sealed),
               let sealedBox = try? ChaChaPoly.SealedBox(combined: sealedData),
@@ -65,7 +65,7 @@ public nonisolated enum ModelExchangeCrypto {
             using: SHA256.self,
             salt: salt,
             sharedInfo: peerSigning,
-            outputByteCount: 32
+            outputByteCount: 32,
         )
     }
 }

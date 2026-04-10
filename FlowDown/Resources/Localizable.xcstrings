@@ -4235,53 +4235,6 @@
         }
       }
     },
-    "Ask Model + Image" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modell fragen + Bild"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ask Model + Image"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preguntar al modelo + imagen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Interroger le modèle + image"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モデルに尋ねる + 画像"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모델에게 요청 + 이미지"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "询问模型 + 图像"
-          }
-        }
-      }
-    },
     "Assistant" : {
       "localizations" : {
         "de" : {
@@ -7372,53 +7325,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分类"
-          }
-        }
-      }
-    },
-    "Classify + Image" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klassifizieren + Bild"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Classify + Image"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clasificar + imagen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Classer + image"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分類 + 画像"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "분류 + 이미지"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分类 + 图像"
           }
         }
       }
@@ -48389,52 +48295,6 @@
         }
       }
     },
-    "This summary is provided automatically according to the user's proactive memory setting, even when memory tools are disabled." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Zusammenfassung wird automatisch gemäß der proaktiven Erinnerungseinstellung bereitgestellt, auch wenn Memory-Tools deaktiviert sind."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This summary is provided automatically according to the user's proactive memory setting, even when memory tools are disabled."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este resumen se proporciona automáticamente según la configuración de memoria proactiva del usuario, incluso si las herramientas de memoria están desactivadas."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ce résumé est fourni automatiquement selon le réglage de mémoire proactive de l’utilisateur, même si les outils de mémoire sont désactivés."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この要約はメモリーツールが無効でも、ユーザーのプロアクティブメモリー設定に基づき自動提供されます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "메모리 도구가 비활성화되어 있어도 사용자 능동 메모리 설정에 따라 자동으로 제공되는 요약입니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "该摘要根据用户的主动记忆设置自动提供，即使记忆工具未启用也会附带。"
-          }
-        }
-      }
-    },
     "This value will be added to the request as additional header." : {
       "localizations" : {
         "de" : {
@@ -56597,52 +56457,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果启用，粘贴进编辑器的大段文本将会被转换成附件，以提供更流畅的编辑体验。你可以点击附件来编辑内容。"
-          }
-        }
-      }
-    },
-    "When enabled, we will include stored memories in system prompts even if memory tools are disabled." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bei Aktivierung fügen wir gespeicherte Erinnerungen in System-Prompts ein, auch wenn Memory-Tools deaktiviert sind."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When enabled, we will include stored memories in system prompts even if memory tools are disabled."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si está activado, incluiremos los recuerdos almacenados en las instrucciones del sistema incluso si las herramientas de memoria están desactivadas."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quand activé, nous inclurons les mémoires enregistrées dans les invites système même si les outils mémoire sont désactivés."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効時、メモリーツールが無効でも保存メモリーをシステムプロンプトに含めます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "켜면 메모리 도구가 비활성화되어도 저장된 메모리를 시스템 프롬프트에 포함합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开启后，即使未启用记忆工具，也会在系统提示词与快捷指令推理中提供已存储的记忆。"
           }
         }
       }

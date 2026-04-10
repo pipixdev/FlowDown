@@ -60,7 +60,7 @@ public nonisolated enum ModelExchangeURL {
             capabilities: caps,
             multipleSelection: multipleSelection,
             timestamp: Date(timeIntervalSince1970: timestampValue),
-            signature: signature
+            signature: signature,
         )
         return .exchange(exchange)
     }

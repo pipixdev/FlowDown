@@ -233,7 +233,7 @@ extension ModelManager {
     func pack(
         model: LocalModel,
         progress: Progress? = nil,
-        completion: @escaping (URL?, _ cleanUpBlock: @escaping () -> Void) -> Void
+        completion: @escaping (URL?, _ cleanUpBlock: @escaping () -> Void) -> Void,
     ) {
         let url = dirForLocalModel(identifier: model.id)
         let item = model.model_identifier

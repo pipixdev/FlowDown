@@ -20,7 +20,7 @@ import Testing
         reason: "Need a model",
         capabilities: [.audio, .developerRole],
         multipleSelection: false,
-        timestamp: Date(timeIntervalSince1970: 1_700_000_000)
+        timestamp: Date(timeIntervalSince1970: 1_700_000_000),
     )
 
     var components = try #require(URLComponents(url: request.url, resolvingAgainstBaseURL: false))

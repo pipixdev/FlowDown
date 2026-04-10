@@ -45,7 +45,7 @@ extension SettingController.SettingContent {
 
             stackView.addArrangedSubviewWithMargin(
                 ConfigurableSectionFooterView().with(
-                    footer: "When enabled, we will include stored memories in system prompts even if memory tools are disabled.",
+                    footer: "Choose how we proactively shares stored memories with the model during conversations and automations. This includes system Shortcuts.",
                 ),
             ) { $0.top /= 2 }
             stackView.addArrangedSubview(SeparatorView())
@@ -59,14 +59,7 @@ extension SettingController.SettingContent {
             stackView.addArrangedSubview(SeparatorView())
 
             // Add memory tool controls
-            let memoryTools = ModelToolsManager.shared.tools.filter { tool in
-                false
-                    || tool is MTStoreMemoryTool
-                    || tool is MTRecallMemoryTool
-                    || tool is MTListMemoriesTool
-                    || tool is MTUpdateMemoryTool
-                    || tool is MTDeleteMemoryTool
-            }
+            let memoryTools = ModelToolsManager.shared.memoryTools
 
             for tool in memoryTools {
                 stackView.addArrangedSubviewWithMargin(tool.createConfigurableObjectView())

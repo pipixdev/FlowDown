@@ -31,7 +31,15 @@ extension ConversationSession {
             requestMessages.append(.system(content: .text(runtimeContent)))
         }
 
-        if let proactiveMemoryContext = await MemoryStore.shared.formattedProactiveMemoryContext() {
+        let enabledTools = ModelToolsManager.shared.enabledTools
+        let shouldExposeMemory = ModelToolsManager.shouldExposeMemory(
+            modelWillExecuteTools: modelWillExecuteTools,
+            enabledTools: enabledTools,
+        )
+
+        if shouldExposeMemory,
+           let proactiveMemoryContext = await MemoryStore.shared.formattedProactiveMemoryContext()
+        {
             requestMessages.append(.system(content: .text(proactiveMemoryContext)))
             proactiveMemoryProvided = true
         }
@@ -60,14 +68,7 @@ extension ConversationSession {
                 The system provides several tools for your convenience. Please use them wisely and according to the user's query. Avoid requesting information that is already provided or easily inferred.
                 """)
 
-            // Add memory tools guidance if memory tools are enabled
-            let memoryToolsEnabled = await ModelToolsManager.shared.getEnabledToolsIncludeMCP().contains { tool in
-                tool is MTStoreMemoryTool || tool is MTRecallMemoryTool ||
-                    tool is MTListMemoriesTool || tool is MTUpdateMemoryTool ||
-                    tool is MTDeleteMemoryTool
-            }
-
-            if memoryToolsEnabled {
+            if shouldExposeMemory {
                 toolGuidance += "\n\n" + MemoryStore.memoryToolsPrompt
             }
 

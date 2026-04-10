@@ -4,7 +4,7 @@ import Testing
 
 struct HuggingFaceAPITests {
     @Test
-    func decodeFiles_filtersDirectoriesAndKeepsFileMetadata() throws {
+    func `decode files filters directories and keeps file metadata`() throws {
         let data = Data(
             """
             [
@@ -27,25 +27,25 @@ struct HuggingFaceAPITests {
                 "path": "tokenizer.json"
               }
             ]
-            """.utf8
+            """.utf8,
         )
 
         let files = try HuggingFaceAPI().decodeFiles(from: data)
 
         #expect(files.map(\.path) == [".gitattributes", "model.safetensors", "tokenizer.json"])
-        #expect(files.map(\.size) == [1519, 278064920, nil])
+        #expect(files.map(\.size) == [1519, 278_064_920, nil])
     }
 
     @Test
-    func totalSize_ignoresMissingSizes() {
+    func `total size ignores missing sizes`() {
         let files = [
             HuggingFaceRepositoryFile(type: "file", size: 1519, path: ".gitattributes"),
-            HuggingFaceRepositoryFile(type: "file", size: 278064920, path: "model.safetensors"),
+            HuggingFaceRepositoryFile(type: "file", size: 278_064_920, path: "model.safetensors"),
             HuggingFaceRepositoryFile(type: "file", size: nil, path: "tokenizer.json"),
         ]
 
         let totalSize = HuggingFaceAPI().totalSize(of: files)
 
-        #expect(totalSize == 278066439)
+        #expect(totalSize == 278_066_439)
     }
 }

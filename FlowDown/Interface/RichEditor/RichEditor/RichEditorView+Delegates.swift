@@ -535,7 +535,7 @@ extension RichEditorView: ControlPanel.Delegate {
             )
             self?.parentViewController?.present(indicator, animated: true)
             Scrubber.document(for: url) { [weak self] doc in
-                indicator.dismiss(animated: true) {
+                Task { @MainActor in indicator.dismiss(animated: true) {
                     guard let doc else {
                         let alert = AlertViewController(
                             title: NSLocalizedString("Error", comment: ""),
@@ -558,6 +558,7 @@ extension RichEditorView: ControlPanel.Delegate {
                         storageSuffix: UUID().uuidString,
                     )
                     self?.attachmentsBar.insert(item: attachment)
+                }
                 }
             }
         }

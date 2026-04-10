@@ -10,11 +10,6 @@ import UIKit
 class KeyboardNavigationSearchBar: UISearchBar {
     weak var keyboardNavigationDelegate: KeyboardNavigationDelegate?
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        setupKeyboardHandling()
-    }
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupKeyboardHandling()

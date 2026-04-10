@@ -282,17 +282,20 @@ extension ConversationSession {
         }()
 
         if !isEphemeral {
+            let shouldExtractMemory = modelWillExecuteTools && ModelToolsManager.shared.canStoreMemory
             let recentMessages = Array(messages.suffix(6))
             let auxModel = models.auxiliary ?? models.chat
             let convId = id
             let allMessages = messages
             await MainActor.run {
-                Task {
-                    await MemoryExtractor.shared.extractIfNeeded(
-                        from: recentMessages,
-                        conversationId: convId.description,
-                        using: auxModel,
-                    )
+                _ = Task {
+                    if shouldExtractMemory {
+                        await MemoryExtractor.shared.extractIfNeeded(
+                            from: recentMessages,
+                            conversationId: convId.description,
+                            using: auxModel,
+                        )
+                    }
                     await ConversationSummarizer.shared.summarizeIfNeeded(
                         conversationId: convId,
                         messages: allMessages,

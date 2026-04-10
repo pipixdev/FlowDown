@@ -92,6 +92,44 @@ class ModelToolsManager {
         }
     }
 
+    var memoryTools: [ModelTool] {
+        tools.filter(Self.isMemoryTool)
+    }
+
+    var enabledMemoryTools: [ModelTool] {
+        enabledTools.filter(Self.isMemoryTool)
+    }
+
+    var enabledMemoryWritingTools: [ModelTool] {
+        enabledTools.filter(Self.isMemoryWritingTool)
+    }
+
+    var canStoreMemory: Bool {
+        enabledTools.contains { $0 is MTStoreMemoryTool }
+    }
+
+    static func isMemoryTool(_ tool: ModelTool) -> Bool {
+        tool is MTStoreMemoryTool ||
+            tool is MTRecallMemoryTool ||
+            tool is MTListMemoriesTool ||
+            tool is MTUpdateMemoryTool ||
+            tool is MTDeleteMemoryTool
+    }
+
+    static func isMemoryWritingTool(_ tool: ModelTool) -> Bool {
+        tool is MTStoreMemoryTool ||
+            tool is MTUpdateMemoryTool ||
+            tool is MTDeleteMemoryTool
+    }
+
+    static func shouldExposeMemory(
+        modelWillExecuteTools: Bool,
+        enabledTools: [ModelTool],
+    ) -> Bool {
+        guard modelWillExecuteTools else { return false }
+        return enabledTools.contains(where: isMemoryTool)
+    }
+
     func getEnabledToolsIncludeMCP() async -> [ModelTool] {
         var result = enabledTools
         let mcpTools = await MCPService.shared.listServerTools()
@@ -239,7 +277,7 @@ class ModelToolsManager {
                     data: dataString,
                     mimeType: mimeType,
                     annotations: _,
-                    _meta: metadata
+                    _meta: metadata,
                 ):
                     var name = metadata?["name"] as? String ?? ""
                     if name.isEmpty {
@@ -260,7 +298,7 @@ class ModelToolsManager {
                     data: dataString,
                     mimeType: mimeType,
                     annotations: _,
-                    _meta: _
+                    _meta: _,
                 ):
                     var name = String(localized: "Tool Provided Audio")
                     if !mimeType.isEmpty {

@@ -352,7 +352,6 @@ class MemoryStore: ObservableObject {
             let header = String(localized: "Proactive Memory Context")
             let scopeDescription = String(localized: scope.briefDescription)
             let scopeLine = String(localized: "Scope: \(scopeDescription)")
-            let note = String(localized: "This summary is provided automatically according to the user's proactive memory setting, even when memory tools are disabled.")
 
             let dateFormatter = DateFormatter()
             dateFormatter.dateStyle = .medium
@@ -364,7 +363,7 @@ class MemoryStore: ObservableObject {
             }
             .joined(separator: "\n")
 
-            return [header, scopeLine, note, "", body].joined(separator: "\n")
+            return [header, scopeLine, "", body].joined(separator: "\n")
         } catch {
             Logger.database.errorFile("MemoryStore failed to build proactive memory context: \(error)")
             return nil

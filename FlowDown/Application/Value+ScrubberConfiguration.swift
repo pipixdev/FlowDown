@@ -10,8 +10,7 @@ import ConfigurableKit
 import Foundation
 import ScrubberKit
 
-nonisolated(unsafe)
-extension ScrubberConfiguration {
+nonisolated(unsafe) extension ScrubberConfiguration {
     static let googleEnabledKey = "app.scrubber.engine.google.enabled"
     static let duckduckgoEnabledKey = "app.scrubber.engine.duckduckgo.enabled"
     static let yahooEnabledKey = "app.scrubber.engine.yahoo.enabled"
