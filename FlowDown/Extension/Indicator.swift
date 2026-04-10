@@ -44,6 +44,8 @@ enum Indicator {
     typealias CompletionDismissRequest = @MainActor () async -> Void
     typealias CompletionCallback = (CompletionDismissRequest) async -> Void
     typealias ExecutionWithCompletion = (CompletionCallback) async throws -> Void
+    typealias ProgressCallback = @MainActor (String) -> Void
+    typealias ExecutionWithProgressCompletion = (ProgressCallback, CompletionCallback) async throws -> Void
 
     static func progress(
         title: String.LocalizationValue,
@@ -60,28 +62,31 @@ enum Indicator {
             )
             controller.present(alert, animated: true) {
                 Task.detached(priority: .userInitiated) {
-                    var capturedError: Error?
-                    let completion: CompletionCallback = { @MainActor callerCompletionItem in
-                        await alert.dismiss()
-                        if let error = capturedError {
-                            let errorAlert = AlertViewController(
-                                title: "Error",
-                                message: "An error occurred: \(error.localizedDescription)",
-                            ) { context in
-                                context.allowSimpleDispose()
-                                context.addAction(title: "OK", attribute: .accent) {
-                                    context.dispose()
-                                }
-                            }
-                            controller.present(errorAlert, animated: true)
-                        }
-                        await callerCompletionItem()
-                    }
-                    do {
+                    await runProgressTask(on: controller, alert: alert) { _, completion in
                         try await completionExecutor(completion)
-                    } catch {
-                        capturedError = error
-                        await completion {}
+                    }
+                }
+            }
+        }
+    }
+
+    static func progress(
+        title: String.LocalizationValue,
+        message: String.LocalizationValue? = nil,
+        controller: UIViewController,
+        completionExecutor: @escaping ExecutionWithProgressCompletion,
+    ) {
+        Task { @MainActor in
+            let titleString = String(localized: title)
+            let messageString = if let message { String(localized: message) } else { String("") }
+            let alert = AlertProgressIndicatorViewController(
+                title: titleString,
+                message: messageString,
+            )
+            controller.present(alert, animated: true) {
+                Task.detached(priority: .userInitiated) {
+                    await runProgressTask(on: controller, alert: alert) { progress, completion in
+                        try await completionExecutor(progress, completion)
                     }
                 }
             }
@@ -97,6 +102,39 @@ enum Indicator {
             safari.preferredContentSize = CGSize(width: 555, height: 555)
             referencedView?.parentViewController?.present(safari, animated: true)
         #endif
+    }
+
+    private static func runProgressTask(
+        on controller: UIViewController,
+        alert: AlertProgressIndicatorViewController,
+        operation: @escaping @Sendable (ProgressCallback, CompletionCallback) async throws -> Void
+    ) async {
+        var capturedError: Error?
+        let progress: ProgressCallback = { message in
+            alert.progressContext.purpose(message: message)
+        }
+        let completion: CompletionCallback = { @MainActor callerCompletionItem in
+            await alert.dismiss()
+            if let error = capturedError {
+                let errorAlert = AlertViewController(
+                    title: "Error",
+                    message: "An error occurred: \(error.localizedDescription)",
+                ) { context in
+                    context.allowSimpleDispose()
+                    context.addAction(title: "OK", attribute: .accent) {
+                        context.dispose()
+                    }
+                }
+                controller.present(errorAlert, animated: true)
+            }
+            await callerCompletionItem()
+        }
+        do {
+            try await operation(progress, completion)
+        } catch {
+            capturedError = error
+            await completion {}
+        }
     }
 }
 

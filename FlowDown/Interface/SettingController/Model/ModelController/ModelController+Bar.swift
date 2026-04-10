@@ -209,9 +209,34 @@ extension SettingController.SettingContent.ModelController {
                         Indicator.progress(
                             title: "Exporting Model",
                             controller: self,
-                        ) { completionHandler in
+                        ) { updateProgress, completionHandler in
+                            let progress = Progress(totalUnitCount: 0)
+                            let progressObserver = progress.observe(\.completedUnitCount, options: [.initial, .new]) { progress, _ in
+                                let percent = if progress.totalUnitCount > 0 {
+                                    Int((progress.fractionCompleted * 100).rounded())
+                                } else {
+                                    0
+                                }
+                                Task { @MainActor in
+                                    updateProgress("\(percent)%")
+                                }
+                            }
+                            let totalObserver = progress.observe(\.totalUnitCount, options: [.new]) { progress, _ in
+                                let percent = if progress.totalUnitCount > 0 {
+                                    Int((progress.fractionCompleted * 100).rounded())
+                                } else {
+                                    0
+                                }
+                                Task { @MainActor in
+                                    updateProgress("\(percent)%")
+                                }
+                            }
+                            defer {
+                                progressObserver.invalidate()
+                                totalObserver.invalidate()
+                            }
                             let (url, _) = await withCheckedContinuation { continuation in
-                                ModelManager.shared.pack(model: model) { url, error in
+                                ModelManager.shared.pack(model: model, progress: progress) { url, error in
                                     continuation.resume(returning: (url, error))
                                 }
                             }

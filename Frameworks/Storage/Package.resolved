@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/Litext",
       "state" : {
-        "revision" : "3cbe3ffa94f6a2cf7fa7cf91e4f2aeac437d3a1f",
-        "version" : "1.1.0"
+        "revision" : "a2ed9b63ae623a20591effc72f9db7d04e41a64c",
+        "version" : "1.2.1"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/MarkdownView",
       "state" : {
-        "revision" : "b33f699a388939fc543c935b870675b91ecbc9f6",
-        "version" : "3.7.0"
+        "revision" : "37f97345a108e95f66b6671c317b43063c7f2de1",
+        "version" : "3.8.2"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "8d9834a6189db730f6264db7556a7ffb751e99ee",
-        "version" : "1.4.0"
+        "revision" : "6675bc0ff86e61436e615df6fc5174e043e57924",
+        "version" : "1.4.1"
       }
     },
     {

@@ -230,7 +230,11 @@ extension ModelManager {
         dirForLocalModel(identifier: model.id).appendingPathComponent("content")
     }
 
-    func pack(model: LocalModel, completion: @escaping (URL?, _ cleanUpBlock: @escaping () -> Void) -> Void) {
+    func pack(
+        model: LocalModel,
+        progress: Progress? = nil,
+        completion: @escaping (URL?, _ cleanUpBlock: @escaping () -> Void) -> Void
+    ) {
         let url = dirForLocalModel(identifier: model.id)
         let item = model.model_identifier
             .replacingOccurrences(of: "/", with: "_")
@@ -246,13 +250,12 @@ extension ModelManager {
         let zipFile = tempDir.appendingPathComponent(item).appendingPathExtension("zip")
         Task.detached {
             do {
-                let copy = tempDir.appendingPathComponent("Export-\(item)")
-                try FileManager.default.copyItem(at: url, to: copy)
                 try FileManager.default.zipItem(
-                    at: copy,
+                    at: url,
                     to: zipFile,
                     shouldKeepParent: false,
                     compressionMethod: .none,
+                    progress: progress,
                 )
                 completion(zipFile, cleanUpBlock)
             } catch {
