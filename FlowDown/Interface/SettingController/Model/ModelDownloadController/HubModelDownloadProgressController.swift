@@ -391,6 +391,9 @@ class HubModelDownloadProgressController: UIViewController {
             activityIndicator.startAnimating()
             contentStackView.addArrangedSubview(activityIndicator)
             contentStackView.addArrangedSubview(progressContentStackView)
+            progressContentStackView.snp.remakeConstraints { make in
+                make.width.equalTo(containerStackView)
+            }
 
             cancelButton.isHidden = false
             cancelButton.isEnabled = progress.cancellable
