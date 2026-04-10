@@ -5,6 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Storage",
     platforms: [
+        .macOS(.v14),
         .iOS(.v16),
         .macCatalyst(.v16),
     ],
@@ -12,7 +13,7 @@ let package = Package(
         .library(name: "Storage", type: .dynamic, targets: ["Storage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Lakr233/MarkdownView", from: "3.8.2"),
+        .package(url: "https://github.com/Lakr233/MarkdownView", from: "3.9.1"),
         .package(url: "https://github.com/Lakr233/wcdb-spm-prebuilt", from: "2.1.15"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.4.1"),
         .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.20"),

@@ -11,6 +11,7 @@ FlowDown is a Swift-based AI/LLM client for iOS and macOS (Catalyst) with a priv
 ## Environment & Tooling
 
 - Prefer opening `FlowDown.xcworkspace` so the app and frameworks resolve together under shared schemes.
+- `ChatClientKit` intentionally relies on the `FlowDown.xcworkspace` package override for `mlx-swift-lm`; keep `Frameworks/ChatClientKit/Package.swift` on `branch: "main"` for that dependency and validate integration changes through workspace builds, not standalone `swift build`/`swift test` of `ChatClientKit`.
 - Use Xcode 26.x (Swift 6.0 toolchain) or newer to satisfy package manifests and the Swift `Testing` library.
 - Build on macOS 26 or later to ensure compatibility with the required toolchain.
 - Install `xcbeautify` (`brew install xcbeautify`) and pipe build output through `xcbeautify -qq` for readable logs.
