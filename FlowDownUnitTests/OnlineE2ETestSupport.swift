@@ -3,6 +3,10 @@ import Foundation
 import Storage
 
 enum OnlineE2ETestSupport {
+    static let enableFlag = "FLOWDOWN_ENABLE_E2E"
+    static let explicitTokenName = "FLOWDOWN_ONLINE_E2E_TOKEN"
+    static let fallbackTokenName = "OPENROUTER_API_KEY"
+
     private static let embeddedFixture = EmbeddedCloudModelFixture(
         modelIdentifier: "moonshotai/kimi-k2.5",
         endpoint: "https://openrouter.ai/api/v1/chat/completions",
@@ -17,13 +21,18 @@ enum OnlineE2ETestSupport {
         name: "Embedded Online E2E Model",
     )
 
-    static let isEnabled: Bool = {
+    static var isEnabled: Bool {
+        guard isExecutionEnabled else { return false }
+        return runtimeToken(in: ProcessInfo.processInfo.environment) != nil
+    }
+
+    static var isExecutionEnabled: Bool {
         let environment = ProcessInfo.processInfo.environment
-        if environment["FLOWDOWN_RUN_ONLINE_E2E"] == "0" {
+        if environment[enableFlag] == "0" {
             return false
         }
-        return runtimeToken(in: environment) != nil
-    }()
+        return true
+    }
 
     static func runtimeCloudModel() throws -> CloudModel {
         let environment = ProcessInfo.processInfo.environment
@@ -60,10 +69,10 @@ enum OnlineE2ETestSupport {
     }
 
     private static func runtimeToken(in environment: [String: String]) -> String? {
-        if let token = trimmedNonEmpty(environment["FLOWDOWN_ONLINE_E2E_TOKEN"]) {
+        if let token = trimmedNonEmpty(environment[explicitTokenName]) {
             return token
         }
-        if let token = trimmedNonEmpty(environment["OPENROUTER_API_KEY"]) {
+        if let token = trimmedNonEmpty(environment[fallbackTokenName]) {
             return token
         }
         return tokenFromSecretFiles()
