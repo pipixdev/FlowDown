@@ -44,16 +44,6 @@ struct ConversationTitle: Equatable {
     var title: String
 }
 
-private extension String {
-    func trimmingMarkdownBold() -> String {
-        var result = self
-        if result.hasPrefix("**"), result.hasSuffix("**"), result.count > 4 {
-            result = String(result.dropFirst(2).dropLast(2))
-        }
-        return result
-    }
-}
-
 extension ConversationSessionManager.Session {
     func generateConversationTitle() async -> String? {
         guard let userMessage = messages.last(where: { $0.role == .user })?.document else {
@@ -93,15 +83,10 @@ extension ConversationSessionManager.Session {
             let sanitizedContent = ModelResponseSanitizer.stripReasoning(from: raw)
 
             if let title = extractTitleFromXML(sanitizedContent) {
-                return title.count > 32 ? String(title.prefix(32)) : title
+                return title
             }
 
-            var ret = sanitizedContent
-                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                .trimmingMarkdownBold()
-            if ret.isEmpty { return nil }
-            if ret.count > 32 { ret = String(ret.prefix(32)) }
-            return ret
+            return ConversationMetadataParser.normalizedTitle(sanitizedContent)
         } catch {
             Logger.model.errorFile("failed to generate title: \(error)")
             return nil
@@ -109,13 +94,7 @@ extension ConversationSessionManager.Session {
     }
 
     private func extractTitleFromXML(_ xmlString: String) -> String? {
-        // Try XMLCoder first
-        if let title = extractTitleUsingXMLCoder(xmlString) {
-            return title
-        }
-
-        // Fallback to regex method
-        return extractTitleUsingRegex(xmlString)
+        ConversationMetadataParser.parseXML(xmlString)?.title
     }
 
     private func extractTitleUsingXMLCoder(_ xmlString: String) -> String? {
@@ -125,10 +104,7 @@ extension ConversationSessionManager.Session {
         if let data = xmlString.data(using: .utf8),
            let titleResponse = try? decoder.decode(TitleResponse.self, from: data)
         {
-            let cleanTitle = titleResponse.title
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .trimmingMarkdownBold()
-            return cleanTitle.isEmpty ? nil : cleanTitle
+            return ConversationMetadataParser.normalizedTitle(titleResponse.title)
         }
 
         return nil
@@ -149,10 +125,6 @@ extension ConversationSessionManager.Session {
             return nil
         }
 
-        let title = String(xmlString[titleRange])
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingMarkdownBold()
-
-        return title.isEmpty ? nil : title
+        return ConversationMetadataParser.normalizedTitle(String(xmlString[titleRange]))
     }
 }
