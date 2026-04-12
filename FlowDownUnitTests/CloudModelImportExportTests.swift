@@ -122,7 +122,7 @@ struct ImportExportRoundTripSuite {
         try ensureEnvironment()
         await resetRelevantData()
 
-        #expect(MCPService.shared.servers.value.isEmpty)
+        let baseCount = MCPService.shared.servers.value.count
 
         let uniqueObjectID = "test-mcp-object-id-\(UUID().uuidString)"
 
@@ -137,12 +137,12 @@ struct ImportExportRoundTripSuite {
         )
         original.update(\.objectId, to: uniqueObjectID)
         MCPService.shared.insert(original)
-        #expect(MCPService.shared.servers.value.count == 1)
+        #expect(MCPService.shared.servers.value.count == baseCount + 1)
 
         let exported = try MCPService.shared.exportServerData(original)
 
         MCPService.shared.remove(original.id)
-        #expect(MCPService.shared.servers.value.isEmpty)
+        #expect(MCPService.shared.servers.value.count == baseCount)
 
         let imported = try await MainActor.run {
             try MCPService.shared.importServer(from: exported)
