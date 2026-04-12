@@ -1,12 +1,7 @@
 name: Test
 
-# This workflow runs unit tests on pull requests.
-# To make this workflow a required check before merging PRs:
-# 1. Go to repository Settings → Branches
-# 2. Add or edit branch protection rule for your main branch
-# 3. Enable "Require status checks to pass before merging"
-# 4. Search for and select "Unit Tests" in the status checks list
-# 5. Save the protection rule
+# This workflow runs unit tests on pull requests, and online E2E tests
+# when the OPENROUTER_API_KEY secret is available.
 
 on:
   pull_request:
@@ -20,10 +15,13 @@ on:
       - ".github/workflows/test.yml"
       - "Makefile"
       - "Package.resolved"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
 
 jobs:
   test:
-    if: ${{ !startsWith(github.head_ref, 'housekeeping/') }}
+    if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'housekeeping/') }}
     name: Unit Tests
     runs-on: macos-26
     env:
@@ -91,6 +89,52 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/*/Logs/Test/*.xcresult
+          if-no-files-found: warn
+          retention-days: 7
+
+  online-e2e:
+    if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'housekeeping/') }}
+    name: Online E2E
+    needs: test
+    runs-on: macos-26
+    env:
+      XCODE_VERSION: "26.3"
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    permissions:
+      contents: read
+    steps:
+      - name: Check API Key
+        run: |
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "::notice::OPENROUTER_API_KEY not available, skipping online E2E tests"
+            echo "SKIP_E2E=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Checkout
+        if: env.SKIP_E2E != 'true'
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Select Newest Xcode
+        if: env.SKIP_E2E != 'true'
+        run: |
+          chmod +x Resources/DevKit/scripts/select_newest_xcode.sh
+          ./Resources/DevKit/scripts/select_newest_xcode.sh
+
+      - name: Run Online E2E
+        if: env.SKIP_E2E != 'true'
+        run: |
+          chmod +x Resources/DevKit/scripts/run_online_e2e_tests.sh
+          ./Resources/DevKit/scripts/run_online_e2e_tests.sh
+
+      - name: Upload Test Results
+        if: always() && env.SKIP_E2E != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: online-e2e-results
           path: |
             ~/Library/Developer/Xcode/DerivedData/*/Logs/Test/*.xcresult
           if-no-files-found: warn

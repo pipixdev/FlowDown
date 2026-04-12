@@ -14,9 +14,25 @@ enum OnlineE2ETestSupport {
             "HTTP-Referer": "https://flowdown.ai/",
             "X-Title": "FlowDown",
         ],
-        bodyFields: "",
-        context: .medium_64k,
-        capabilities: [.tool],
+        bodyFields: """
+        {
+          "provider" : {
+            "allow_fallbacks" : false,
+            "data_collection" : "deny",
+            "order" : [
+              "fireworks"
+            ],
+            "zdr" : true
+          },
+          "reasoning" : {
+            "enabled" : true,
+            "max_tokens" : 200
+          },
+          "temperature" : 0.2
+        }
+        """,
+        context: .long_200k,
+        capabilities: [.visual, .tool],
         comment: "online-e2e",
         name: "Embedded Online E2E Model",
     )
