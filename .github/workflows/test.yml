@@ -4,6 +4,9 @@ name: Test
 # when the OPENROUTER_API_KEY secret is available.
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     paths:
       - "FlowDown/**"
@@ -24,8 +27,6 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || !startsWith(github.head_ref, 'housekeeping/') }}
     name: Unit Tests
     runs-on: macos-26
-    env:
-      XCODE_VERSION: "26.3"
     permissions:
       contents: read
     steps:
@@ -100,7 +101,6 @@ jobs:
     needs: test
     runs-on: macos-26
     env:
-      XCODE_VERSION: "26.3"
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     permissions:
       contents: read

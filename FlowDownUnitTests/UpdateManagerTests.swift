@@ -104,10 +104,11 @@ struct UpdateManagerTests {
           "prerelease": false
         }
         """
+        let responseURL = try #require(URL(string: "https://example.com"))
         let session = try URLSessionStub(result: .success((
             Data(payload.utf8),
             #require(HTTPURLResponse(
-                url: #require(URL(string: "https://example.com")),
+                url: responseURL,
                 statusCode: 200,
                 httpVersion: nil,
                 headerFields: nil,
