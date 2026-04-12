@@ -6,7 +6,7 @@ import Testing
 @Suite(.serialized)
 struct OnlineModelBackedE2ETests {
     private func withTemporaryCloudModel<T>(
-        _ body: @escaping (ModelManager.ModelIdentifier) async throws -> T
+        _ body: @escaping (ModelManager.ModelIdentifier) async throws -> T,
     ) async throws -> T {
         try await FlowDownTestContext.shared.ensureBootstrappedEnvironment()
         let model = try OnlineE2ETestSupport.runtimeCloudModel()
@@ -35,7 +35,7 @@ struct OnlineModelBackedE2ETests {
         modelID: ModelManager.ModelIdentifier,
         exchanges: [(Message.Role, String)],
         shouldAutoRename: Bool = false,
-        clearIcon: Bool = false
+        clearIcon: Bool = false,
     ) -> Conversation.ID {
         ConversationManager.shouldShowGuideMessage = false
         let conversation = ConversationManager.shared.createNewConversation {
@@ -84,7 +84,7 @@ struct OnlineModelBackedE2ETests {
     @MainActor
     private func compressConversation(
         identifier: Conversation.ID,
-        modelID: ModelManager.ModelIdentifier
+        modelID: ModelManager.ModelIdentifier,
     ) async throws -> Conversation.ID {
         try await withCheckedThrowingContinuation { continuation in
             ConversationManager.shared.compressConversation(
@@ -101,7 +101,7 @@ struct OnlineModelBackedE2ETests {
     @MainActor
     private func extractTemplate(
         from conversationID: Conversation.ID,
-        modelID: ModelManager.ModelIdentifier
+        modelID: ModelManager.ModelIdentifier,
     ) async throws -> ChatTemplate {
         guard let conversation = ConversationManager.shared.conversation(identifier: conversationID) else {
             throw NSError(
@@ -126,7 +126,7 @@ struct OnlineModelBackedE2ETests {
     private func rewriteTemplate(
         _ template: ChatTemplate,
         request: String,
-        modelID: ModelManager.ModelIdentifier
+        modelID: ModelManager.ModelIdentifier,
     ) async throws -> ChatTemplate {
         try await withCheckedThrowingContinuation { continuation in
             ChatTemplateManager.shared.rewriteTemplate(
@@ -208,7 +208,7 @@ struct OnlineModelBackedE2ETests {
                 #expect(
                     summary.localizedCaseInsensitiveContains("Alice")
                         || summary.localizedCaseInsensitiveContains("Bob")
-                        || summary.localizedCaseInsensitiveContains("Carol")
+                        || summary.localizedCaseInsensitiveContains("Carol"),
                 )
             } catch {
                 await MainActor.run {
@@ -253,7 +253,7 @@ struct OnlineModelBackedE2ETests {
                     combined.contains("travel")
                         || combined.contains("trip")
                         || combined.contains("itinerary")
-                        || combined.contains("kyoto")
+                        || combined.contains("kyoto"),
                 )
             } catch {
                 await MainActor.run {

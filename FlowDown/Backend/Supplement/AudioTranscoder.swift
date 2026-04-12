@@ -221,7 +221,7 @@ enum AudioTranscoder {
             }
 
             let duration = try await loadDurationSeconds(of: asset)
-            let data = try Data(contentsOf: outputURL)
+            let data = try await readExportedData(from: outputURL)
             try? FileManager.default.removeItem(at: outputURL)
 
             return Result(data: data, duration: duration, format: output.fileExtension)
@@ -437,6 +437,27 @@ enum AudioTranscoder {
         let duration = try await asset.load(.duration)
         let seconds = CMTimeGetSeconds(duration)
         return seconds.isFinite ? seconds : 0
+    }
+
+    private static func readExportedData(
+        from url: URL,
+        retries: Int = 20,
+        delay: Duration = .milliseconds(50),
+    ) async throws -> Data {
+        var lastError: Error?
+
+        for attempt in 0 ..< retries {
+            do {
+                return try Data(contentsOf: url)
+            } catch {
+                lastError = error
+                if attempt + 1 < retries {
+                    try await Task.sleep(for: delay)
+                }
+            }
+        }
+
+        throw lastError ?? AudioTranscoderError.exportFailed("Exported file was not created.")
     }
 
     private static func detectedSampleRate(from descriptions: [CMFormatDescription]) -> Double {

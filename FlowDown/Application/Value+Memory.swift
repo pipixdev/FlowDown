@@ -139,7 +139,7 @@ enum MemoryProactiveProvisionSetting {
     }
 
     static func shouldInjectRecentConversationContext(
-        for scope: MemoryProactiveProvisionScope
+        for scope: MemoryProactiveProvisionScope,
     ) -> Bool {
         scope != .off
     }

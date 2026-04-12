@@ -5,13 +5,13 @@
 //  Created by GPT-5 Codex on 4/12/26.
 //
 
-@testable import FlowDown
 import ChatClientKit
+@testable import FlowDown
 import Testing
 
 struct ConversationSystemPromptBuilderTests {
-    struct MemoryExposureCase: Sendable, CustomTestStringConvertible {
-        enum ToolSet: Sendable {
+    struct MemoryExposureCase: CustomTestStringConvertible {
+        enum ToolSet {
             case memory
             case nonMemory
         }
@@ -30,8 +30,8 @@ struct ConversationSystemPromptBuilderTests {
         }
     }
 
-    struct RecentConversationCase: Sendable, CustomTestStringConvertible {
-        enum ToolSet: Sendable {
+    struct RecentConversationCase: CustomTestStringConvertible {
+        enum ToolSet {
             case memory
             case nonMemory
         }
@@ -392,7 +392,7 @@ struct ConversationSystemPromptBuilderTests {
 }
 
 private actor PromptContextProviderRecorder {
-    struct Snapshot: Sendable {
+    struct Snapshot {
         let proactiveRequests: Int
         let recentRequests: Int
     }

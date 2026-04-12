@@ -17,16 +17,11 @@ struct TranslationProviderView: View {
     @State var inputText: String
 
     let models: [CloudModel]
+    @StateObject var translationModel = TranslationProviderModel()
     @AppStorage("wiki.qaq.fd.tp.selectedModelIdentifier")
     var selectedModelIdentifier: CloudModel.ID = ""
     @AppStorage("wiki.qaq.fd.tp.selectedLanguageHint")
     var selectedLanguageHint: String = ""
-    @State var translationReasoning: String = ""
-    @State var translationPlainResult: String = ""
-    @State var translationSegmentedResult: [TranslationSegment] = []
-
-    @State var translationTask: Task<Void, Never>? = nil
-    @State var translationError: Error? = nil
     @State var translateOnAppear = true
 
     var canTranslate: Bool {
@@ -60,11 +55,11 @@ struct TranslationProviderView: View {
             footer
         }
         .padding(.horizontal)
-        .animation(.spring, value: translationError?.localizedDescription)
-        .animation(.spring, value: translationReasoning)
-        .animation(.spring, value: translationPlainResult)
-        .animation(.spring, value: translationSegmentedResult)
-        .animation(.spring, value: translationTask != nil ? 1 : 0)
+        .animation(.spring, value: translationModel.translationError?.localizedDescription)
+        .animation(.spring, value: translationModel.translationReasoning)
+        .animation(.spring, value: translationModel.translationPlainResult)
+        .animation(.spring, value: translationModel.translationSegmentedResult)
+        .animation(.spring, value: translationModel.isTranslating ? 1 : 0)
         .animation(.spring, value: selectedModelIdentifier)
         .animation(.spring, value: selectedLanguageHint)
         .onAppear {
@@ -91,20 +86,10 @@ struct TranslationProviderView: View {
 
     func translate() {
         let targetLanguage = selectedLanguageHint.isEmpty ? currentLocaleDescription : selectedLanguageHint
-        let oldTask = translationTask
-        oldTask?.cancel()
-        Task.detached {
-            _ = await oldTask?.result
-            await MainActor.run {
-                translationTask = .detached {
-                    do {
-                        try await translateEx(language: targetLanguage)
-                    } catch {
-                        await MainActor.run { translationError = error }
-                    }
-                    await MainActor.run { translationTask = nil }
-                }
-            }
-        }
+        translationModel.translate(
+            inputText: inputText,
+            model: model,
+            language: targetLanguage,
+        )
     }
 }

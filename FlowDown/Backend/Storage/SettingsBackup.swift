@@ -47,8 +47,8 @@ enum SettingsBackup {
 
     private static let decoder = JSONDecoder()
 
-    static func export() throws -> URL {
-        let storage = try userDefaultsStorage()
+    static func export(storage: KeyValueStorage = ConfigurableKit.storage) throws -> URL {
+        let storage = try userDefaultsStorage(from: storage)
         let items = try collectConfigurableItems(from: storage)
         guard !items.isEmpty else { throw SettingsBackupError.emptyBackup }
 
@@ -72,8 +72,8 @@ enum SettingsBackup {
         return outputURL
     }
 
-    static func importBackup(from url: URL) throws {
-        let storage = try userDefaultsStorage()
+    static func importBackup(from url: URL, storage: KeyValueStorage = ConfigurableKit.storage) throws {
+        let storage = try userDefaultsStorage(from: storage)
         let data = try Data(contentsOf: url)
         let payload = try decoder.decode(SettingsBackupPayload.self, from: data)
         guard payload.formatVersion == SettingsBackupPayload.version else {
@@ -92,8 +92,8 @@ enum SettingsBackup {
 }
 
 private extension SettingsBackup {
-    static func userDefaultsStorage() throws -> UserDefaultKeyValueStorage {
-        guard let storage = ConfigurableKit.storage as? UserDefaultKeyValueStorage else {
+    static func userDefaultsStorage(from storage: KeyValueStorage) throws -> UserDefaultKeyValueStorage {
+        guard let storage = storage as? UserDefaultKeyValueStorage else {
             throw SettingsBackupError.unsupportedStorage
         }
         return storage

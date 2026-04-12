@@ -27,7 +27,7 @@ struct ApplicationScopeTests {
         #expect(StreamAudioEffectSetting.custom.icon == "music.note")
         #expect(StreamAudioEffectSetting.off.audioIndex == nil)
         #expect(StreamAudioEffectSetting.custom.audioIndex == nil)
-        #expect((0 ... 9).contains(try #require(StreamAudioEffectSetting.random.audioIndex)))
+        #expect(try (0 ... 9).contains(#require(StreamAudioEffectSetting.random.audioIndex)))
 
         #expect(UIUserInterfaceStyle.cases == [.light, .dark, .unspecified])
         #expect(UIUserInterfaceStyle.light.icon == "sun.max")
@@ -41,7 +41,7 @@ struct ApplicationScopeTests {
 
     private func expectFilter(
         _ actual: MemoryProactiveProvisionScope.Filter,
-        equals expected: MemoryProactiveProvisionScope.Filter
+        equals expected: MemoryProactiveProvisionScope.Filter,
     ) {
         switch (actual, expected) {
         case (.none, .none), (.all, .all):

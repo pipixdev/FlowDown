@@ -105,7 +105,7 @@ extension LocalModel {
 
 extension ModelManager {
     func scanLocalModels() -> [LocalModel] {
-        guard MLX.GPU.isSupported else { return [] }
+        guard gpuSupportProvider() else { return [] }
 
         let contents = try? FileManager.default.contentsOfDirectory(
             at: localModelDir,
@@ -266,7 +266,7 @@ extension ModelManager {
 
     func unpackAndImport(modelAt url: URL) -> Result<LocalModel> {
         assert(!Thread.isMainThread)
-        guard MLX.GPU.isSupported else {
+        guard gpuSupportProvider() else {
             return .failure(NSError(domain: "MLX", code: 2, userInfo: [
                 NSLocalizedDescriptionKey: String(localized: "Your device does not support MLX."),
             ]))

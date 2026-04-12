@@ -76,7 +76,7 @@ struct ConversationScopeTests {
     @Test
     func `conversation metadata parser preserves title normalization rules`() {
         let normalized = ConversationMetadataParser.normalizedTitle(
-            "**1234567890123456789012345678901234567890**"
+            "**1234567890123456789012345678901234567890**",
         )
 
         #expect(normalized == "12345678901234567890123456789012")

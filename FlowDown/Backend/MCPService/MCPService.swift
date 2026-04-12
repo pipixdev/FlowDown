@@ -13,12 +13,14 @@ import Storage
 class MCPService: NSObject {
     static let shared = MCPService()
     static let executor = MCPServiceActor.shared
+    typealias ConnectionFactory = (ModelContextServer) -> any MCPConnectionControlling
 
     // MARK: - Properties
 
     let servers: CurrentValueSubject<[ModelContextServer], Never> = .init([])
-    private(set) var connections: [ModelContextServer.ID: MCPConnection] = [:]
+    private(set) var connections: [ModelContextServer.ID: any MCPConnectionControlling] = [:]
     private var cancellables = Set<AnyCancellable>()
+    var connectionFactory: ConnectionFactory = { MCPConnection(config: $0) }
 
     // MARK: - Initialization
 
@@ -133,7 +135,7 @@ class MCPService: NSObject {
     }
 
     func ensureOrReconnect(_ serverID: ModelContextServer.ID) {
-        if let connection = connections[serverID], connection.client != nil { return }
+        if let connection = connections[serverID], connection.hasClient { return }
         guard let server = sdb.modelContextServerWith(serverID) else { return }
         updateServerStatus(serverID, status: .disconnected)
         Task {
@@ -156,19 +158,17 @@ class MCPService: NSObject {
                     self.connections[serverID]?.disconnect()
                     self.connections.removeValue(forKey: serverID)
                     self.updateServerStatus(serverID, status: .disconnected)
-                    let connection: MCPConnection = try await self.connectOnce(server)
+                    let connection = try await self.connectOnce(server)
                     if server.isEnabled { self.connections[serverID] = connection }
-                    guard let client = connection.client else {
-                        assertionFailure()
-                        throw MCPError.connectionFailed
-                    }
-                    await self.negotiateCapabilities(client: client, config: server)
-                    let tools = try await client.listTools().tools
-                    let toolSummary = tools.map { tool in
+                    let toolInfos = try await connection.listToolInfos(
+                        serverID: serverID,
+                        serverName: server.displayName,
+                    )
+                    let toolSummary = toolInfos.map { toolInfo in
                         if let toolServer = self.server(with: serverID) {
-                            return "\(toolServer.displayName): \(tool.name)"
+                            return "\(toolServer.displayName): \(toolInfo.name)"
                         }
-                        return tool.name
+                        return toolInfo.name
                     }.joined(separator: ", ")
                     completion(.success(toolSummary))
                 } catch {
@@ -209,14 +209,10 @@ class MCPService: NSObject {
         }
     }
 
-    private func connectOnce(_ config: ModelContextServer) async throws -> MCPConnection {
-        let connection = MCPConnection(config: config)
+    private func connectOnce(_ config: ModelContextServer) async throws -> any MCPConnectionControlling {
+        let connection = connectionFactory(config)
         try await connection.connect()
-        if let client = connection.client {
-            await negotiateCapabilities(client: client, config: config)
-        } else {
-            assertionFailure("failed to establish client connection")
-        }
+        await negotiateCapabilities(connection: connection, config: config)
         updateServerStatus(config.id, status: .connected)
         return connection
     }
@@ -231,11 +227,14 @@ class MCPService: NSObject {
         }
     }
 
-    private func negotiateCapabilities(client: MCP.Client, config: ModelContextServer) async {
+    private func negotiateCapabilities(connection: any MCPConnectionControlling, config: ModelContextServer) async {
         var discoveredCapabilities: [String] = []
 
         do {
-            let (tools, _) = try await client.listTools()
+            let tools = try await connection.listToolInfos(
+                serverID: config.id,
+                serverName: config.displayName,
+            )
             if !tools.isEmpty {
                 discoveredCapabilities.append("tools")
             }
