@@ -17,6 +17,15 @@ public extension Storage {
     }
 
     #if DEBUG
+        package static func makeForTesting(
+            name: String = "Test",
+            databaseDir: URL,
+        ) throws -> Storage {
+            try Storage(name: name, databaseDir: databaseDir)
+        }
+    #endif
+
+    #if DEBUG
         static func resetForTesting() {
             instance = nil
         }

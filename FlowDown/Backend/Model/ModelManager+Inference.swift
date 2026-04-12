@@ -27,7 +27,7 @@ extension ModelManager {
     }()
 
     func testLocalModel(_ model: LocalModel, completion: @escaping (Result<Void, Error>) -> Void) {
-        guard MLX.GPU.isSupported else {
+        guard gpuSupportProvider() else {
             completion(.failure(NSError(domain: "GPU", code: -1, userInfo: [
                 NSLocalizedDescriptionKey: String(localized: "Your device does not support MLX."),
             ])))
@@ -37,10 +37,9 @@ extension ModelManager {
             assert(!Thread.isMainThread)
 
             do {
-                let preferredKind: MLXModelKind = model.capabilities.contains(.visual) ? .vlm : .llm
-                let client = MLXChatClient(
-                    url: ModelManager.shared.modelContent(for: model),
-                    preferredKind: preferredKind,
+                let client = try self.chatService(
+                    for: model.id,
+                    additionalBodyField: [:],
                 )
                 await client.errorCollector.clear()
 
@@ -223,6 +222,19 @@ extension ModelManager {
     }
 
     private func chatService(
+        for identifier: ModelIdentifier,
+        additionalBodyField: [String: Any],
+    ) throws -> any ChatService {
+        if let chatServiceFactory {
+            return try chatServiceFactory(identifier, additionalBodyField)
+        }
+        return try makeDefaultChatService(
+            for: identifier,
+            additionalBodyField: additionalBodyField,
+        )
+    }
+
+    private func makeDefaultChatService(
         for identifier: ModelIdentifier,
         additionalBodyField: [String: Any],
     ) throws -> any ChatService {

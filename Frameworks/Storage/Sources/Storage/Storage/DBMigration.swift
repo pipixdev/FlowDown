@@ -9,6 +9,172 @@ import Foundation
 import Logger
 import WCDBSwift
 
+private struct AttachmentTableSchema: TableCodable {
+    var objectId: String = .init()
+    var deviceId: String = .init()
+    var messageId: String = .init()
+    var data: Data = .init()
+    var previewImageData: Data = .init()
+    var imageRepresentation: Data = .init()
+    var representedDocument: String = .init()
+    var type: String = .init()
+    var name: String = .init()
+    var storageSuffix: String = .init()
+    var removed: Bool = false
+    var creation: Date = .now
+    var modified: Date = .now
+
+    enum CodingKeys: String, CodingTableKey {
+        typealias Root = AttachmentTableSchema
+
+        static let objectRelationalMapping = TableBinding(CodingKeys.self) {
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
+            BindColumnConstraint(deviceId, isNotNull: true)
+            BindColumnConstraint(messageId, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(data, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(previewImageData, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(imageRepresentation, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(representedDocument, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(type, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(name, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(storageSuffix, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(removed, isNotNull: false, defaultTo: false)
+            BindColumnConstraint(creation, isNotNull: true)
+            BindColumnConstraint(modified, isNotNull: true)
+
+            BindIndex(creation, namedWith: "_creationIndex")
+            BindIndex(modified, namedWith: "_modifiedIndex")
+            BindIndex(messageId, namedWith: "_messageIdIndex")
+        }
+
+        case objectId
+        case deviceId
+        case messageId
+        case data
+        case previewImageData
+        case imageRepresentation
+        case representedDocument
+        case type
+        case name
+        case storageSuffix
+        case removed
+        case creation
+        case modified
+    }
+}
+
+private struct MessageTableSchema: TableCodable {
+    var objectId: String = .init()
+    var deviceId: String = .init()
+    var conversationId: String = .init()
+    var creation: Date = .now
+    var role: String = Message.Role.system.rawValue
+    var thinkingDuration: Double = 0
+    var reasoningContent: String = .init()
+    var isThinkingFold: Bool = false
+    var document: String = .init()
+    var documentNodes: Data = .init()
+    var webSearchStatus: Data = .init()
+    var toolStatus: Data = .init()
+    var removed: Bool = false
+    var modified: Date = .now
+    var metadata: Data?
+
+    enum CodingKeys: String, CodingTableKey {
+        typealias Root = MessageTableSchema
+
+        static let objectRelationalMapping = TableBinding(CodingKeys.self) {
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
+            BindColumnConstraint(deviceId, isNotNull: true)
+            BindColumnConstraint(conversationId, isNotNull: true)
+            BindColumnConstraint(creation, isNotNull: true)
+            BindColumnConstraint(role, isNotNull: true, defaultTo: Message.Role.system.rawValue)
+            BindColumnConstraint(thinkingDuration, isNotNull: true, defaultTo: 0)
+            BindColumnConstraint(reasoningContent, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(isThinkingFold, isNotNull: true, defaultTo: false)
+            BindColumnConstraint(document, isNotNull: true, defaultTo: "")
+            BindColumnConstraint(documentNodes, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(webSearchStatus, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(toolStatus, isNotNull: true, defaultTo: Data())
+            BindColumnConstraint(removed, isNotNull: false, defaultTo: false)
+            BindColumnConstraint(modified, isNotNull: true)
+            BindColumnConstraint(metadata, isNotNull: false)
+
+            BindIndex(creation, namedWith: "_creationIndex")
+            BindIndex(modified, namedWith: "_modifiedIndex")
+            BindIndex(conversationId, namedWith: "_conversationIdIndex")
+        }
+
+        case objectId
+        case deviceId
+        case conversationId
+        case creation
+        case role
+        case thinkingDuration
+        case reasoningContent
+        case isThinkingFold
+        case document
+        case documentNodes
+        case webSearchStatus
+        case toolStatus
+        case removed
+        case modified
+        case metadata
+    }
+}
+
+private func createUploadQueueTable(db: Database) throws {
+    let columns: [ColumnDef] = [
+        ColumnDef(with: Column(named: "id"), and: .integer64)
+            .makePrimary(isAutoIncrement: true),
+        ColumnDef(with: Column(named: "tableName"), and: .text)
+            .makeNotNull(),
+        ColumnDef(with: Column(named: "objectId"), and: .text)
+            .makeNotNull(),
+        ColumnDef(with: Column(named: "deviceId"), and: .text)
+            .makeNotNull(),
+        ColumnDef(with: Column(named: "creation"), and: .float)
+            .makeNotNull(),
+        ColumnDef(with: Column(named: "modified"), and: .float)
+            .makeNotNull(),
+        ColumnDef(with: Column(named: "changes"), and: .integer32)
+            .makeNotNull()
+            .makeDefault(to: UploadQueue.Changes.insert.rawValue),
+        ColumnDef(with: Column(named: "state"), and: .integer32)
+            .makeNotNull()
+            .makeDefault(to: UploadQueue.State.pending.rawValue),
+        ColumnDef(with: Column(named: "failCount"), and: .integer32)
+            .makeNotNull()
+            .makeDefault(to: 0),
+    ]
+    let statement = StatementCreateTable()
+        .create(table: UploadQueue.tableName)
+        .ifNotExists()
+        .with(columns: columns)
+    try db.exec(statement)
+
+    let stateIndex = StatementCreateIndex()
+        .create(index: "\(UploadQueue.tableName)_stateIndex")
+        .ifNotExists()
+        .on(table: UploadQueue.tableName)
+        .indexesBy(Column(named: "state"))
+    try db.exec(stateIndex)
+
+    let tableNameAndStateIndex = StatementCreateIndex()
+        .create(index: "\(UploadQueue.tableName)_tableNameAndStateIndex")
+        .ifNotExists()
+        .on(table: UploadQueue.tableName)
+        .indexesBy(Column(named: "tableName"), Column(named: "state"))
+    try db.exec(tableNameAndStateIndex)
+
+    let tableNameAndObjectIdIndex = StatementCreateIndex()
+        .create(index: "\(UploadQueue.tableName)_tableNameANDObjectIdIndex")
+        .ifNotExists()
+        .on(table: UploadQueue.tableName)
+        .indexesBy(Column(named: "tableName"), Column(named: "objectId"))
+    try db.exec(tableNameAndObjectIdIndex)
+}
+
 protocol DBMigration {
     var fromVersion: DBVersion { get }
     var toVersion: DBVersion { get }
@@ -90,8 +256,8 @@ struct MigrationV1ToV2: DBMigration {
     }
 
     private func performSchemaMigration(db: Database) throws {
-        try db.create(table: Attachment.tableName, of: Attachment.self)
-        try db.create(table: Message.tableName, of: Message.self)
+        try createAttachmentTable(db: db)
+        try createMessageTable(db: db)
         try db.create(table: Conversation.tableName, of: Conversation.self)
 
         try db.create(table: CloudModel.tableName, of: CloudModel.self)
@@ -99,7 +265,15 @@ struct MigrationV1ToV2: DBMigration {
         try db.create(table: Memory.tableName, of: Memory.self)
 
         try db.create(table: SyncMetadata.tableName, of: SyncMetadata.self)
-        try db.create(table: UploadQueue.tableName, of: UploadQueue.self)
+        try createUploadQueueTable(db: db)
+    }
+
+    private func createAttachmentTable(db: Database) throws {
+        try db.create(table: Attachment.tableName, of: AttachmentTableSchema.self)
+    }
+
+    private func createMessageTable(db: Database) throws {
+        try db.create(table: Message.tableName, of: MessageTableSchema.self)
     }
 
     private func performDataMigration(db: Database) throws {
@@ -484,7 +658,7 @@ struct MigrationV2ToV3: DBMigration {
         try db.create(table: Message.tableName, of: Message.self)
 
         // 调整了索引
-        try db.create(table: UploadQueue.tableName, of: UploadQueue.self)
+        try createUploadQueueTable(db: db)
 
         try db.exec(StatementPragma().pragma(.userVersion).to(toVersion.rawValue))
 

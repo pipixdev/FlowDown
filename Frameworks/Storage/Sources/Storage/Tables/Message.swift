@@ -41,7 +41,7 @@ public final class Message: Identifiable, Codable, TableNamed, DeviceOwned, Tabl
     public enum CodingKeys: String, CodingTableKey {
         public typealias Root = Message
         public static let objectRelationalMapping = TableBinding(CodingKeys.self) {
-            BindColumnConstraint(objectId, isPrimary: true, isNotNull: true, isUnique: true)
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
             BindColumnConstraint(deviceId, isNotNull: true)
 
             BindColumnConstraint(creation, isNotNull: true)

@@ -33,7 +33,7 @@ public final class Attachment: Identifiable, Codable, TableNamed, DeviceOwned, T
     public enum CodingKeys: String, CodingTableKey {
         public typealias Root = Attachment
         public static let objectRelationalMapping = TableBinding(CodingKeys.self) {
-            BindColumnConstraint(objectId, isPrimary: true, isNotNull: true, isUnique: true)
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
             BindColumnConstraint(deviceId, isNotNull: true)
 
             BindColumnConstraint(creation, isNotNull: true)

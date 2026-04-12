@@ -31,7 +31,7 @@ public final class ChatTemplateRecord: Identifiable, Codable, TableNamed, Device
     public enum CodingKeys: String, CodingTableKey {
         public typealias Root = ChatTemplateRecord
         public static let objectRelationalMapping = TableBinding(CodingKeys.self) {
-            BindColumnConstraint(objectId, isPrimary: true, isNotNull: true, isUnique: true)
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
             BindColumnConstraint(deviceId, isNotNull: true)
 
             BindColumnConstraint(creation, isNotNull: true)

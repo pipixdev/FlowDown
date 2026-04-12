@@ -15,25 +15,25 @@ extension TranslationProviderView {
         if canTranslate {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    if !translationSegmentedResult.isEmpty {
-                        ForEach(translationSegmentedResult) { segment in
+                    if !translationModel.translationSegmentedResult.isEmpty {
+                        ForEach(translationModel.translationSegmentedResult) { segment in
                             TranslateSegmentView(segment: segment)
                         }
                         .transition(.opacity)
-                    } else if !translationPlainResult.isEmpty {
-                        Text(translationPlainResult)
+                    } else if !translationModel.translationPlainResult.isEmpty {
+                        Text(translationModel.translationPlainResult)
                             .textSelection(.enabled)
                             .font(.body)
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
                             .contentTransition(.numericText())
                             .frame(maxWidth: .infinity, alignment: .leading)
-                    } else if translationTask == nil {
+                    } else if !translationModel.isTranslating {
                         Text("(Empty Content)")
                             .opacity(0.5)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    if translationTask != nil {
+                    if translationModel.isTranslating {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                             .transition(.opacity)

@@ -30,7 +30,7 @@ extension TranslationProviderView {
 
     var footer: some View {
         VStack(spacing: 8) {
-            if let translationError {
+            if let translationError = translationModel.translationError {
                 Text(translationError.localizedDescription)
                     .foregroundStyle(.red)
                     .font(.caption)
@@ -85,7 +85,7 @@ extension TranslationProviderView {
         }
         .buttonStyle(.plain)
         Button {
-            UIPasteboard.general.string = translationPlainResult
+            UIPasteboard.general.string = translationModel.translationPlainResult
             context.finish(translation: nil)
         } label: {
             IconButtonContainer(icon: "doc.on.doc.fill", foregroundColor: .accent)

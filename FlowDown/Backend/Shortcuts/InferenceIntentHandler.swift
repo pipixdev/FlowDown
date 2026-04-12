@@ -32,6 +32,63 @@ enum InferenceIntentHandler {
         }
     }
 
+    struct Dependencies {
+        var resolveModelIdentifier: (ShortcutsEntities.ModelEntity?) throws -> ModelManager.ModelIdentifier = {
+            try InferenceIntentHandler.resolveModelIdentifier(model: $0)
+        }
+        var modelCapabilities: (ModelManager.ModelIdentifier) -> Set<ModelCapabilities> = {
+            ModelManager.shared.modelCapabilities(identifier: $0)
+        }
+        var preparePrompt: () -> String = {
+            InferenceIntentHandler.preparePrompt()
+        }
+        var enabledToolsProvider: () -> [ModelTool] = {
+            ModelToolsManager.shared.enabledTools
+        }
+        var shouldExposeMemory: (Bool, [ModelTool]) -> Bool = { modelWillExecuteTools, enabledTools in
+            ModelToolsManager.shouldExposeMemory(
+                modelWillExecuteTools: modelWillExecuteTools,
+                enabledTools: enabledTools,
+            )
+        }
+        var proactiveMemoryContextProvider: () async -> String? = {
+            await MemoryStore.shared.formattedProactiveMemoryContext()
+        }
+        var memoryWritingToolsProvider: () -> [ModelTool] = {
+            InferenceIntentHandler.allWritingMemoryTools()
+        }
+        var streamingInfer: (ModelManager.ModelIdentifier, [ChatRequestBody.Message], [ChatRequestBody.Tool]?) async throws -> AsyncThrowingStream<ChatResponseChunk, Error> = { modelID, input, tools in
+            try await ModelManager.shared.streamingInfer(
+                with: modelID,
+                input: input,
+                tools: tools,
+            )
+        }
+        var executeMemoryWritingToolCalls: ([ToolRequest], [ModelTool]) async -> Void = { toolCalls, tools in
+            await InferenceIntentHandler.executeMemoryWritingToolCalls(toolCalls, using: tools)
+        }
+        var persistConversation: @MainActor (
+            ModelManager.ModelIdentifier,
+            String,
+            [RichEditorView.Object.Attachment],
+            String,
+            String,
+            Date
+        ) -> Void = { modelIdentifier, userMessage, attachments, response, reasoning, date in
+            InferenceIntentHandler.persistQuickReplyConversation(
+                modelIdentifier: modelIdentifier,
+                userMessage: userMessage,
+                attachments: attachments,
+                response: response,
+                reasoning: reasoning,
+                date: date,
+            )
+        }
+        var clock: () -> Date = { Date() }
+
+        static var live: Self { .init() }
+    }
+
     private struct PreparedImageResources {
         let contentPart: ChatRequestBody.Message.ContentPart
         let attachment: RichEditorView.Object.Attachment
@@ -42,13 +99,17 @@ enum InferenceIntentHandler {
         let attachment: RichEditorView.Object.Attachment
     }
 
+    static var defaultDependencies: Dependencies = .live
+
     static func execute(
         model: ShortcutsEntities.ModelEntity?,
         message: String,
         image: IntentFile?,
         audio: IntentFile?,
         options: Options,
+        dependencies: Dependencies? = nil,
     ) async throws -> String {
+        let dependencies = dependencies ?? defaultDependencies
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         let hasImage = image != nil
         let hasAudio = audio != nil
@@ -60,11 +121,11 @@ enum InferenceIntentHandler {
             throw ShortcutError.emptyMessage
         }
 
-        let modelIdentifier = try resolveModelIdentifier(model: model)
+        let modelIdentifier = try dependencies.resolveModelIdentifier(model)
         let modelCapabilities = await MainActor.run {
-            ModelManager.shared.modelCapabilities(identifier: modelIdentifier)
+            dependencies.modelCapabilities(modelIdentifier)
         }
-        let prompt = preparePrompt()
+        let prompt = dependencies.preparePrompt()
 
         var requestMessages: [ChatRequestBody.Message] = []
         if !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -73,14 +134,11 @@ enum InferenceIntentHandler {
 
         var proactiveMemoryProvided = false
         var memoryWritingTools: [ModelTool] = []
-        let enabledTools = ModelToolsManager.shared.enabledTools
-        let shouldExposeMemory = ModelToolsManager.shouldExposeMemory(
-            modelWillExecuteTools: options.enableMemory,
-            enabledTools: enabledTools,
-        )
+        let enabledTools = dependencies.enabledToolsProvider()
+        let shouldExposeMemory = dependencies.shouldExposeMemory(options.enableMemory, enabledTools)
 
         if shouldExposeMemory {
-            if let memoryContext = await MemoryStore.shared.formattedProactiveMemoryContext(),
+            if let memoryContext = await dependencies.proactiveMemoryContextProvider(),
                !memoryContext.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             {
                 proactiveMemoryProvided = true
@@ -89,7 +147,7 @@ enum InferenceIntentHandler {
             if modelCapabilities.contains(.tool) {
                 let guidance = memoryToolGuidance(proactiveMemoryProvided: proactiveMemoryProvided)
                 requestMessages.append(.system(content: .text(guidance)))
-                memoryWritingTools = allWritingMemoryTools()
+                memoryWritingTools = dependencies.memoryWritingToolsProvider()
             }
         }
 
@@ -127,11 +185,7 @@ enum InferenceIntentHandler {
         requestMessages.append(userMessage)
 
         let toolDefinitions = memoryWritingTools.isEmpty ? nil : memoryWritingTools.map(\.definition)
-        let inference = try await ModelManager.shared.streamingInfer(
-            with: modelIdentifier,
-            input: requestMessages,
-            tools: toolDefinitions,
-        )
+        let inference = try await dependencies.streamingInfer(modelIdentifier, requestMessages, toolDefinitions)
 
         var content = ""
         var reasoningContent = ""
@@ -171,17 +225,21 @@ enum InferenceIntentHandler {
            !memoryWritingTools.isEmpty,
            !toolRequests.isEmpty
         {
-            await executeMemoryWritingToolCalls(toolRequests, using: memoryWritingTools)
+            await dependencies.executeMemoryWritingToolCalls(toolRequests, memoryWritingTools)
         }
 
         if options.saveToConversation {
-            await persistQuickReplyConversation(
-                modelIdentifier: modelIdentifier,
-                userMessage: trimmedMessage,
-                attachments: attachmentsForConversation,
-                response: response,
-                reasoning: trimmedReasoning,
-            )
+            let now = dependencies.clock()
+            await MainActor.run {
+                dependencies.persistConversation(
+                    modelIdentifier,
+                    trimmedMessage,
+                    attachmentsForConversation,
+                    response,
+                    trimmedReasoning,
+                    now,
+                )
+            }
         }
 
         return response
@@ -356,12 +414,13 @@ enum InferenceIntentHandler {
         attachments: [RichEditorView.Object.Attachment],
         response: String,
         reasoning: String,
+        date: Date,
     ) {
         let formatter = DateFormatter()
         formatter.locale = .current
         formatter.dateStyle = .none
         formatter.timeStyle = .short
-        let suffix = formatter.string(from: Date())
+        let suffix = formatter.string(from: date)
 
         let titleFormat = String(
             localized: "Quick Reply %@",

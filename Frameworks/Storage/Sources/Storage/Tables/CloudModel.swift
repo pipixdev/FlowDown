@@ -49,7 +49,7 @@ public final class CloudModel: Identifiable, Codable, Equatable, Hashable, Table
     public enum CodingKeys: String, CodingTableKey {
         public typealias Root = CloudModel
         public static let objectRelationalMapping = TableBinding(CodingKeys.self) {
-            BindColumnConstraint(objectId, isPrimary: true, isNotNull: true, isUnique: true)
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
             BindColumnConstraint(deviceId, isNotNull: true)
 
             BindColumnConstraint(creation, isNotNull: true)

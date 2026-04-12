@@ -10,6 +10,7 @@ import ChatClientKit
 import Combine
 import ConfigurableKit
 import Foundation
+import MLX
 import OrderedCollections
 import Storage
 import UIKit
@@ -22,6 +23,7 @@ class ModelManager: NSObject {
     typealias ModelIdentifier = String
     typealias LocalModelIdentifier = LocalModel.ID
     typealias CloudModelIdentifier = CloudModel.ID
+    typealias ChatServiceFactory = (_ identifier: ModelIdentifier, _ additionalBodyField: [String: Any]) throws -> any ChatService
 
     let localModelDir: URL
     let localModelDownloadTempDir: URL
@@ -33,6 +35,10 @@ class ModelManager: NSObject {
 
     let encoder = PropertyListEncoder()
     let decoder = PropertyListDecoder()
+
+    var chatServiceFactory: ChatServiceFactory?
+    var gpuSupportProvider: () -> Bool = { MLX.GPU.isSupported }
+    var dateProvider: () -> Date = { Date() }
 
     @TypedStorage(key: "Model.Inference.Prompt.Default", defaultValue: PromptType.complete)
     var defaultPrompt: PromptType
@@ -94,15 +100,25 @@ class ModelManager: NSObject {
 
     var cancellables: Set<AnyCancellable> = []
 
-    override private init() {
-        assert(LocalModelIdentifier.self == ModelIdentifier.self)
-        assert(CloudModelIdentifier.self == ModelIdentifier.self)
-
+    private convenience override init() {
         let base = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first!
-        localModelDir = base.appendingPathComponent("Models.Local")
-        localModelDownloadTempDir = base.appendingPathComponent("Models.Local.Temp")
+        self.init(
+            localModelDir: base.appendingPathComponent("Models.Local"),
+            localModelDownloadTempDir: base.appendingPathComponent("Models.Local.Temp"),
+        )
+    }
+
+    init(
+        localModelDir: URL,
+        localModelDownloadTempDir: URL,
+    ) {
+        assert(LocalModelIdentifier.self == ModelIdentifier.self)
+        assert(CloudModelIdentifier.self == ModelIdentifier.self)
+
+        self.localModelDir = localModelDir
+        self.localModelDownloadTempDir = localModelDownloadTempDir
 
         super.init()
 

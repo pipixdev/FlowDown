@@ -4,7 +4,83 @@ import DpkgVersion
 import Foundation
 import UIKit
 
-private enum DistributionChannel: String, Equatable, Hashable {
+protocol URLSessioning {
+    func data(from url: URL) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessioning {}
+
+protocol BundleInfoProviding {
+    var infoDictionary: [String: Any]? { get }
+    var appStoreReceiptURL: URL? { get }
+}
+
+extension Bundle: BundleInfoProviding {}
+
+protocol ReceiptStateProviding {
+    func fileExists(atPath path: String) -> Bool
+}
+
+extension FileManager: ReceiptStateProviding {}
+
+protocol ReleaseFeedClient {
+    func latestGitHubRelease() async throws -> GitHubRelease
+}
+
+struct GitHubRelease: Equatable {
+    let tagName: String
+    let body: String?
+    let htmlURL: String
+    let draft: Bool
+    let prerelease: Bool
+}
+
+struct GitHubReleaseFeedClient: ReleaseFeedClient {
+    struct Payload: Decodable {
+        let tagName: String
+        let body: String?
+        let htmlURL: String
+        let draft: Bool
+        let prerelease: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case tagName = "tag_name"
+            case body
+            case htmlURL = "html_url"
+            case draft
+            case prerelease
+        }
+    }
+
+    let session: URLSessioning
+    let latestReleaseURL: URL
+
+    init(
+        session: URLSessioning = URLSession.shared,
+        latestReleaseURL: URL = URL(string: "https://api.github.com/repos/Lakr233/FlowDown/releases/latest")!,
+    ) {
+        self.session = session
+        self.latestReleaseURL = latestReleaseURL
+    }
+
+    func latestGitHubRelease() async throws -> GitHubRelease {
+        let (data, _) = try await session.data(from: latestReleaseURL)
+        guard let payload = try? JSONDecoder().decode(Payload.self, from: data) else {
+            throw NSError(domain: "UpdateManagerError", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: String(localized: "Failed to parse release information."),
+            ])
+        }
+        return .init(
+            tagName: payload.tagName,
+            body: payload.body,
+            htmlURL: payload.htmlURL,
+            draft: payload.draft,
+            prerelease: payload.prerelease,
+        )
+    }
+}
+
+enum DistributionChannel: String, Equatable, Hashable {
     case fromApple
     case fromGitHub
 }
@@ -12,33 +88,74 @@ private enum DistributionChannel: String, Equatable, Hashable {
 class UpdateManager: NSObject {
     static let shared = UpdateManager()
 
-    private let currentChannel: DistributionChannel
+    let currentChannel: DistributionChannel
     private weak var anchorView: UIView?
+    private let bundleInfoProvider: BundleInfoProviding
+    private let receiptStateProvider: ReceiptStateProviding
+    private let releaseFeedClient: ReleaseFeedClient
 
     var canCheckForUpdates: Bool {
         // Check if the current channel supports update checking
         [.fromGitHub].contains(currentChannel)
     }
 
-    override private init() {
-        #if targetEnvironment(macCatalyst)
-            if let receiptUrl = Bundle.main.appStoreReceiptURL,
-               FileManager.default.fileExists(atPath: receiptUrl.path)
-            {
-                currentChannel = .fromApple
-            } else {
-                currentChannel = .fromGitHub
-            }
-        #else
-            currentChannel = .fromApple // it's impossible to distribute iOS/iPadOS app through GitHub (right?)
-        #endif
-        Logger.app.infoFile("UpdateManager initialized with channel: \(currentChannel)")
+    private convenience override init() {
+        self.init(
+            bundleInfoProvider: Bundle.main,
+            receiptStateProvider: FileManager.default,
+            releaseFeedClient: GitHubReleaseFeedClient(),
+        )
+    }
+
+    init(
+        currentChannel: DistributionChannel? = nil,
+        bundleInfoProvider: BundleInfoProviding,
+        receiptStateProvider: ReceiptStateProviding,
+        releaseFeedClient: ReleaseFeedClient,
+    ) {
+        self.bundleInfoProvider = bundleInfoProvider
+        self.receiptStateProvider = receiptStateProvider
+        self.releaseFeedClient = releaseFeedClient
+        if let currentChannel {
+            self.currentChannel = currentChannel
+        } else {
+            self.currentChannel = Self.resolveCurrentChannel(
+                supportsGitHubDistribution: {
+                    #if targetEnvironment(macCatalyst)
+                        true
+                    #else
+                        false
+                    #endif
+                }(),
+                bundleInfoProvider: bundleInfoProvider,
+                receiptStateProvider: receiptStateProvider,
+            )
+        }
+        Logger.app.infoFile("UpdateManager initialized with channel: \(self.currentChannel)")
         super.init()
     }
 
-    private var bundleVersion: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+    static func resolveCurrentChannel(
+        supportsGitHubDistribution: Bool,
+        bundleInfoProvider: BundleInfoProviding,
+        receiptStateProvider: ReceiptStateProviding,
+    ) -> DistributionChannel {
+        guard supportsGitHubDistribution else {
+            return .fromApple
+        }
+
+        if let receiptURL = bundleInfoProvider.appStoreReceiptURL,
+           receiptStateProvider.fileExists(atPath: receiptURL.path)
+        {
+            return .fromApple
+        } else {
+            return .fromGitHub
+        }
+    }
+
+    var bundleVersion: String {
+        let version = bundleInfoProvider.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
+        let build = bundleInfoProvider.infoDictionary?["CFBundleVersion"] as? String ?? "0"
         return "\(version).\(build)"
     }
 
@@ -77,7 +194,9 @@ class UpdateManager: NSObject {
         ) { completionHandler in
             var package: DistributionChannel.RemotePackage?
             do {
-                let packages = try await self.currentChannel.getRemoteVersion()
+                let packages = try await self.currentChannel.getRemoteVersion(
+                    releaseFeedClient: self.releaseFeedClient,
+                )
                 package = self.newestPackage(from: packages)
                 package = self.updatePackage(from: package)
                 Logger.app.infoFile("remote packages: \(packages)")
@@ -90,7 +209,7 @@ class UpdateManager: NSObject {
         }
     }
 
-    private func updatePackage(from remotePackage: DistributionChannel.RemotePackage?) -> DistributionChannel.RemotePackage? {
+    func updatePackage(from remotePackage: DistributionChannel.RemotePackage?) -> DistributionChannel.RemotePackage? {
         guard let remotePackage else { return nil }
         let compare = Version.compare(remotePackage.tag, bundleVersion)
         Logger.app.infoFile("comparing \(remotePackage.tag) and \(bundleVersion) result \(compare)")
@@ -98,7 +217,7 @@ class UpdateManager: NSObject {
         return remotePackage
     }
 
-    private func newestPackage(from list: [DistributionChannel.RemotePackage]) -> DistributionChannel.RemotePackage? {
+    func newestPackage(from list: [DistributionChannel.RemotePackage]) -> DistributionChannel.RemotePackage? {
         guard !list.isEmpty, var find = list.first else { return nil }
         for i in 1 ..< list.count where Version.compare(find.tag, list[i].tag) < 0 {
             find = list[i]
@@ -130,34 +249,28 @@ extension DistributionChannel {
         case invalidResponse
     }
 
-    struct RemotePackage {
+    struct RemotePackage: Equatable {
         let tag: String
         let downloadURL: URL
     }
 
-    func getRemoteVersion() async throws -> [RemotePackage] {
+    func getRemoteVersion(releaseFeedClient: ReleaseFeedClient = GitHubReleaseFeedClient()) async throws -> [RemotePackage] {
         switch self {
         case .fromApple:
             return []
         case .fromGitHub:
-            let url = URL(string: "https://api.github.com/repos/Lakr233/FlowDown/releases/latest")!
-            let (data, _) = try await URLSession.shared.data(from: url)
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tagName = json["tag_name"] as? String,
-                  json["body"] as? String != nil, // maybe display updatelog.
-                  let htmlUrl = json["html_url"] as? String,
-                  let draft = json["draft"] as? Bool,
-                  let prerelease = json["prerelease"] as? Bool,
-                  !draft,
-                  !prerelease,
-                  let downloadPageUrl = URL(string: htmlUrl)
+            let release = try await releaseFeedClient.latestGitHubRelease()
+            guard release.body != nil,
+                  !release.draft,
+                  !release.prerelease,
+                  let downloadPageURL = URL(string: release.htmlURL)
             else {
                 throw NSError(domain: "UpdateManagerError", code: 1, userInfo: [
                     NSLocalizedDescriptionKey: String(localized: "Failed to parse release information."),
                 ])
             }
-            Logger.app.infoFile("latest release version: \(tagName), url: \(htmlUrl)")
-            return [.init(tag: tagName, downloadURL: downloadPageUrl)]
+            Logger.app.infoFile("latest release version: \(release.tagName), url: \(release.htmlURL)")
+            return [.init(tag: release.tagName, downloadURL: downloadPageURL)]
         }
     }
 }

@@ -212,7 +212,7 @@ extension ModelManager {
         model.update(\.objectId, to: UUID().uuidString)
         model.update(\.removed, to: false)
 
-        let now = Date.now
+        let now = dateProvider()
         model.update(\.creation, to: now)
         model.update(\.modified, to: now)
 

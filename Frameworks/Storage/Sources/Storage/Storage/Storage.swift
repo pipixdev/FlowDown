@@ -81,7 +81,7 @@ public class Storage {
         }
     }
 
-    private init(name: String, databaseDir: URL) throws {
+    package init(name: String, databaseDir: URL) throws {
         self.databaseDir = databaseDir
 
         databaseLocation = databaseDir

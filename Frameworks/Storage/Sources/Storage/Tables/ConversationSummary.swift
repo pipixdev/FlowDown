@@ -32,7 +32,7 @@ public final class ConversationSummary: Identifiable, Codable, TableNamed, Devic
     public enum CodingKeys: String, CodingTableKey {
         public typealias Root = ConversationSummary
         public static let objectRelationalMapping = TableBinding(CodingKeys.self) {
-            BindColumnConstraint(objectId, isPrimary: true, isNotNull: true, isUnique: true)
+            BindColumnConstraint(objectId, isNotNull: true, isUnique: true)
             BindColumnConstraint(deviceId, isNotNull: true)
 
             BindColumnConstraint(conversationId, isNotNull: true, isUnique: true)
