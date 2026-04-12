@@ -10,5 +10,5 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 //
 
-MARKETING_VERSION = 4.7.9;
+MARKETING_VERSION = 4.8.0;
 CURRENT_PROJECT_VERSION = 1;
