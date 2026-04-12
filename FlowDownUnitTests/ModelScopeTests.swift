@@ -6,6 +6,8 @@ import Testing
 struct ModelScopeTests {
     @Test
     func `cloud model response format inference normalizes endpoints`() {
+        let missingFormat: CloudModel.ResponseFormat? = nil
+
         #expect(
             CloudModel.ResponseFormat.inferredFormat(
                 fromEndpoint: " HTTPS://api.example.com/v1/chat/completions/?query=1#fragment "
@@ -16,7 +18,7 @@ struct ModelScopeTests {
                 fromEndpoint: "https://api.example.com/responses/"
             ) == .responses
         )
-        #expect(CloudModel.ResponseFormat.inferredFormat(fromEndpoint: "") == nil)
+        #expect(CloudModel.ResponseFormat.inferredFormat(fromEndpoint: "") == missingFormat)
         #expect(CloudModel.ResponseFormat.chatCompletions.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../../models")
         #expect(CloudModel.ResponseFormat.responses.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../models")
     }

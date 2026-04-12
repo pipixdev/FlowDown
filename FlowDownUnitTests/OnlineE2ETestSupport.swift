@@ -1,120 +1,133 @@
 @testable import FlowDown
 import Foundation
-@testable import Storage
+import Storage
 
 enum OnlineE2ETestSupport {
     static let enableFlag = "FLOWDOWN_ENABLE_E2E"
-    static let apiKeyName = "OPENROUTER_API_KEY"
-    static let configurationPathName = "FLOWDOWN_E2E_FDMODEL_PATH"
-    private static let supportDirectoryPathName = "FLOWDOWN_E2E_SUPPORT_PATH"
-    private static let defaultSupportDirectoryPath = "/tmp/flowdown-online-e2e"
-    private static let apiKeyFileName = "openrouter.sk"
-    private static let enableMarkerFileName = "flowdown_e2e_enabled"
-    private static let configurationPathFileName = "flowdown_e2e_fdmodel_path"
+    static let explicitTokenName = "FLOWDOWN_ONLINE_E2E_TOKEN"
+    static let fallbackTokenName = "OPENROUTER_API_KEY"
+
+    private static let embeddedFixture = EmbeddedCloudModelFixture(
+        modelIdentifier: "moonshotai/kimi-k2.5",
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: [
+            "HTTP-Referer": "https://flowdown.ai/",
+            "X-Title": "FlowDown",
+        ],
+        bodyFields: "",
+        context: .medium_64k,
+        capabilities: [.tool],
+        comment: "online-e2e",
+        name: "Embedded Online E2E Model",
+    )
 
     static var isEnabled: Bool {
         guard isExecutionEnabled else { return false }
-        guard loadAPIKey() != nil else { return false }
-        return (try? configurationURL()) != nil
+        return runtimeToken(in: ProcessInfo.processInfo.environment) != nil
     }
 
     static var isExecutionEnabled: Bool {
-        let env = ProcessInfo.processInfo.environment
-        if env[enableFlag] == "1" {
-            return true
+        let environment = ProcessInfo.processInfo.environment
+        if environment[enableFlag] == "0" {
+            return false
         }
-
-        return FileManager.default.fileExists(atPath: enableMarkerURL().path)
-    }
-
-    static func configurationURL(file: StaticString = #filePath) throws -> URL {
-        let env = ProcessInfo.processInfo.environment
-        if let explicitPath = env[configurationPathName], !explicitPath.isEmpty {
-            return URL(fileURLWithPath: explicitPath)
-        }
-
-        if
-            let explicitPath = try? String(contentsOf: configurationPathURL(), encoding: .utf8)
-                .trimmingCharacters(in: .whitespacesAndNewlines),
-            !explicitPath.isEmpty
-        {
-            return URL(fileURLWithPath: explicitPath)
-        }
-
-        let repositoryRoot = URL(fileURLWithPath: "\(file)")
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let candidates = try FileManager.default.contentsOfDirectory(
-            at: repositoryRoot,
-            includingPropertiesForKeys: nil,
-        )
-        .filter { $0.pathExtension == ModelManager.flowdownModelConfigurationExtension }
-        .sorted { $0.lastPathComponent < $1.lastPathComponent }
-
-        guard let selected = candidates.first else {
-            throw NSError(
-                domain: "OnlineE2ETestSupport",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "No root .fdmodel file found."],
-            )
-        }
-        return selected
-    }
-
-    static func loadAPIKey(named: String = apiKeyName) -> String? {
-        if let value = ProcessInfo.processInfo.environment[named], !value.isEmpty {
-            return value
-        }
-
-        let content = (try? String(contentsOf: apiKeyURL(), encoding: .utf8))?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let content, !content.isEmpty else {
-            return nil
-        }
-        return content
+        return true
     }
 
     static func runtimeCloudModel() throws -> CloudModel {
-        let data = try Data(contentsOf: configurationURL())
-        let decoder = PropertyListDecoder()
-        let model = try decoder.decode(CloudModel.self, from: data)
-
-        guard let apiKey = loadAPIKey() else {
+        let environment = ProcessInfo.processInfo.environment
+        guard let token = runtimeToken(in: environment) else {
             throw NSError(
                 domain: "OnlineE2ETestSupport",
-                code: 2,
-                userInfo: [NSLocalizedDescriptionKey: "OPENROUTER_API_KEY is not configured."],
+                code: 1,
+                userInfo: [
+                    NSLocalizedDescriptionKey: """
+                    No online E2E API token was found. Set FLOWDOWN_ONLINE_E2E_TOKEN or OPENROUTER_API_KEY, or place the token in ~/.testing/openrouter.sk.
+                    """,
+                ],
             )
         }
 
-        model.update(\.deviceId, to: Storage.deviceId)
-        model.update(\.objectId, to: UUID().uuidString)
-        model.update(\.token, to: apiKey)
-        model.update(\.removed, to: false)
-        let now = Date.now
-        model.update(\.creation, to: now)
-        model.update(\.modified, to: now)
-        return model
+        let fixture = embeddedFixture.overriding(with: environment)
+        let responseFormat = CloudModel.ResponseFormat.inferredFormat(fromEndpoint: fixture.endpoint) ?? .default
+
+        return CloudModel(
+            deviceId: Storage.deviceId,
+            model_identifier: fixture.modelIdentifier,
+            model_list_endpoint: responseFormat.defaultModelListEndpoint,
+            creation: .now,
+            endpoint: fixture.endpoint,
+            token: token,
+            headers: fixture.headers,
+            bodyFields: fixture.bodyFields,
+            context: fixture.context,
+            capabilities: fixture.capabilities,
+            comment: fixture.comment,
+            name: fixture.name,
+            response_format: responseFormat,
+        )
     }
 
-    private static func supportDirectoryURL() -> URL {
-        let env = ProcessInfo.processInfo.environment
-        let path = env[supportDirectoryPathName] ?? defaultSupportDirectoryPath
-        return URL(fileURLWithPath: path, isDirectory: true)
+    private static func runtimeToken(in environment: [String: String]) -> String? {
+        if let token = trimmedNonEmpty(environment[explicitTokenName]) {
+            return token
+        }
+        if let token = trimmedNonEmpty(environment[fallbackTokenName]) {
+            return token
+        }
+        return tokenFromSecretFiles()
     }
 
-    private static func apiKeyURL() -> URL {
-        supportDirectoryURL()
-            .appendingPathComponent(apiKeyFileName)
+    private static func tokenFromSecretFiles() -> String? {
+        for url in secretFileCandidates() {
+            guard let token = try? String(contentsOf: url, encoding: .utf8) else {
+                continue
+            }
+            if let token = trimmedNonEmpty(token) {
+                return token
+            }
+        }
+        return nil
     }
 
-    private static func enableMarkerURL() -> URL {
-        supportDirectoryURL()
-            .appendingPathComponent(enableMarkerFileName)
+    private static func secretFileCandidates() -> [URL] {
+        let currentHome = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+        let hostHome = URL(fileURLWithPath: "/Users", isDirectory: true)
+            .appendingPathComponent(NSUserName(), isDirectory: true)
+
+        var seenPaths = Set<String>()
+        return [currentHome, hostHome]
+            .map { $0.appendingPathComponent(".testing").appendingPathComponent("openrouter.sk") }
+            .filter { seenPaths.insert($0.standardizedFileURL.path).inserted }
     }
 
-    private static func configurationPathURL() -> URL {
-        supportDirectoryURL()
-            .appendingPathComponent(configurationPathFileName)
+    private static func trimmedNonEmpty(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
+private struct EmbeddedCloudModelFixture {
+    let modelIdentifier: String
+    let endpoint: String
+    let headers: [String: String]
+    let bodyFields: String
+    let context: ModelContextLength
+    let capabilities: Set<ModelCapabilities>
+    let comment: String
+    let name: String
+
+    func overriding(with environment: [String: String]) -> Self {
+        Self(
+            modelIdentifier: environment["FLOWDOWN_ONLINE_E2E_MODEL_ID"] ?? modelIdentifier,
+            endpoint: environment["FLOWDOWN_ONLINE_E2E_ENDPOINT"] ?? endpoint,
+            headers: headers,
+            bodyFields: environment["FLOWDOWN_ONLINE_E2E_BODY_FIELDS"] ?? bodyFields,
+            context: context,
+            capabilities: capabilities,
+            comment: comment,
+            name: name,
+        )
     }
 }

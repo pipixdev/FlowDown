@@ -33,15 +33,22 @@ struct OnlineModelBackedE2ETests {
     private func makeConversation(
         title: String,
         modelID: ModelManager.ModelIdentifier,
-        exchanges: [(Message.Role, String)]
+        exchanges: [(Message.Role, String)],
+        shouldAutoRename: Bool = false,
+        clearIcon: Bool = false
     ) -> Conversation.ID {
         ConversationManager.shouldShowGuideMessage = false
         let conversation = ConversationManager.shared.createNewConversation {
             $0.update(\.title, to: title)
             $0.update(\.modelId, to: modelID)
-            $0.update(\.shouldAutoRename, to: false)
+            $0.update(\.shouldAutoRename, to: shouldAutoRename)
+            if clearIcon {
+                $0.update(\.icon, to: Data())
+            }
         }
         let session = ConversationSessionManager.shared.session(for: conversation.id)
+        session.models.chat = modelID
+        session.models.auxiliary = modelID
 
         for message in session.messages where message.role == .system || message.role == .assistant {
             session.delete(messageIdentifier: message.objectId)
@@ -52,6 +59,7 @@ struct OnlineModelBackedE2ETests {
                 $0.update(\.document, to: text)
             }
         }
+
         session.save()
         session.notifyMessagesDidChange()
         return conversation.id
@@ -129,6 +137,43 @@ struct OnlineModelBackedE2ETests {
                     continuation.resume(with: result)
                 },
             )
+        }
+    }
+
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled))
+    @MainActor
+    func `auto rename e2e updates title and icon with one metadata generation flow`() async throws {
+        try await withTemporaryCloudModel { modelID in
+            let originalTitle = "Pending auto rename \(UUID().uuidString.prefix(8))"
+            let conversationID = makeConversation(
+                title: originalTitle,
+                modelID: modelID,
+                exchanges: [
+                    (.user, "Help me name this chat. We are planning a four day Kyoto trip focused on temples, vegetarian food, and a lean budget."),
+                    (.assistant, "Plan saved: four days in Kyoto with temple visits, affordable vegetarian spots, neighborhood-based walking routes, and rainy day backups."),
+                ],
+                shouldAutoRename: true,
+                clearIcon: true,
+            )
+
+            defer {
+                deleteConversationIfPresent(conversationID)
+            }
+
+            let session = ConversationSessionManager.shared.session(for: conversationID)
+            #expect(session.shouldAutoRename)
+
+            await session.updateTitleAndIcon()
+
+            let updatedConversation = try #require(ConversationManager.shared.conversation(identifier: conversationID))
+
+            #expect(!updatedConversation.shouldAutoRename)
+            #expect(!updatedConversation.title.isEmpty)
+            #expect(updatedConversation.title != originalTitle)
+            #expect(updatedConversation.title.count <= 32)
+            #expect(!updatedConversation.title.contains("<title>"))
+            #expect(!updatedConversation.title.contains("**"))
+            #expect(!updatedConversation.icon.isEmpty)
         }
     }
 

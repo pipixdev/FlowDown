@@ -83,12 +83,12 @@ extension ConversationSessionManager.Session {
             let sanitizedContent = ModelResponseSanitizer.stripReasoning(from: raw)
 
             if let icon = extractIconFromXML(sanitizedContent) {
-                return validateIcon(icon)
+                return icon
             }
 
-            let ret = sanitizedContent.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            let ret = ConversationMetadataParser.normalizedIcon(sanitizedContent)
             Logger.ui.debugFile("generated conversation icon: \(ret)")
-            return validateIcon(ret)
+            return ret
         } catch {
             Logger.ui.errorFile("failed to generate icon: \(error)")
             return nil
@@ -96,13 +96,7 @@ extension ConversationSessionManager.Session {
     }
 
     private func extractIconFromXML(_ xmlString: String) -> String? {
-        // Try XMLCoder first
-        if let icon = extractIconUsingXMLCoder(xmlString) {
-            return icon
-        }
-
-        // Fallback to regex method
-        return extractIconUsingRegex(xmlString)
+        ConversationMetadataParser.parseXML(xmlString)?.icon
     }
 
     private func extractIconUsingXMLCoder(_ xmlString: String) -> String? {
@@ -112,9 +106,7 @@ extension ConversationSessionManager.Session {
         if let data = xmlString.data(using: .utf8),
            let iconResponse = try? decoder.decode(IconResponse.self, from: data)
         {
-            let cleanIcon = iconResponse.icon
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            return cleanIcon.isEmpty ? nil : cleanIcon
+            return ConversationMetadataParser.normalizedIcon(iconResponse.icon)
         }
 
         return nil
@@ -135,32 +127,6 @@ extension ConversationSessionManager.Session {
             return nil
         }
 
-        let icon = String(xmlString[iconRange])
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        return icon.isEmpty ? nil : icon
-    }
-
-    private func validateIcon(_ icon: String) -> String? {
-        guard !icon.isEmpty else { return nil }
-
-        // Check if it's a single emoji character
-        guard icon.count == 1 else {
-            // If multiple characters, try to get the first emoji
-            let firstEmoji = icon.first { $0.isEmoji }
-            return firstEmoji.map(String.init)
-        }
-
-        return icon
-    }
-}
-
-// MARK: - Character Extension for Emoji Detection
-
-private extension Character {
-    var isEmoji: Bool {
-        guard let scalar = unicodeScalars.first else { return false }
-        return scalar.properties.isEmoji &&
-            (scalar.value > 0x238C || unicodeScalars.count > 1)
+        return ConversationMetadataParser.normalizedIcon(String(xmlString[iconRange]))
     }
 }
