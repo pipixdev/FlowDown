@@ -137,4 +137,14 @@ enum MemoryProactiveProvisionSetting {
         }
         return .recent30
     }
+
+    static func shouldInjectRecentConversationContext(
+        for scope: MemoryProactiveProvisionScope
+    ) -> Bool {
+        scope != .off
+    }
+
+    static var shouldInjectRecentConversationContext: Bool {
+        shouldInjectRecentConversationContext(for: currentScope)
+    }
 }

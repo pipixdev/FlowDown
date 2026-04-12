@@ -44,4 +44,11 @@ struct MemorySettingsTests {
 
         #expect(context == nil)
     }
+
+    @Test
+    func `recent conversation context is disabled when proactive memory is off`() {
+        #expect(!MemoryProactiveProvisionSetting.shouldInjectRecentConversationContext(for: .off))
+        #expect(MemoryProactiveProvisionSetting.shouldInjectRecentConversationContext(for: .recent15))
+        #expect(MemoryProactiveProvisionSetting.shouldInjectRecentConversationContext(for: .recent30))
+    }
 }
