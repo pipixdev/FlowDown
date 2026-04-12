@@ -41,7 +41,9 @@ final class TranslationProviderModel: ObservableObject {
             }
         }
 
-        static var live: Self { .init() }
+        static var live: Self {
+            .init()
+        }
     }
 
     @Published private(set) var translationReasoning: String = ""

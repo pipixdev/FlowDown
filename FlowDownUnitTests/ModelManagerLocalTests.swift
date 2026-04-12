@@ -1,6 +1,6 @@
-@testable import FlowDown
 import Combine
 import Digger
+@testable import FlowDown
 import Foundation
 import Storage
 import Testing
@@ -62,7 +62,7 @@ struct ModelManagerLocalTests {
             #expect(!FileManager.default.fileExists(atPath: unknownItem.path))
             #expect(!FileManager.default.fileExists(atPath: invalidDirectory.path))
             #expect(!FileManager.default.fileExists(
-                atPath: manager.localModelDir.appendingPathComponent("wrong-directory").path
+                atPath: manager.localModelDir.appendingPathComponent("wrong-directory").path,
             ))
         }
     }
@@ -155,9 +155,9 @@ struct ModelManagerLocalTests {
                 }
                 let imported: LocalModel
                 switch result {
-                case .success(let model):
+                case let .success(model):
                     imported = model
-                case .failure(let error):
+                case let .failure(error):
                     throw error
                 }
                 let importedContent = importManager

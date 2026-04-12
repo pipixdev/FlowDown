@@ -46,8 +46,13 @@ private final class MCPConnectionSpy: MCPConnectionControlling {
         self.toolNames = toolNames
     }
 
-    var hasClient: Bool { true }
-    var isConnected: Bool { true }
+    var hasClient: Bool {
+        true
+    }
+
+    var isConnected: Bool {
+        true
+    }
 
     func connect() async throws {
         connectCount += 1

@@ -100,7 +100,7 @@ class ModelManager: NSObject {
 
     var cancellables: Set<AnyCancellable> = []
 
-    private convenience override init() {
+    override private convenience init() {
         let base = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first!

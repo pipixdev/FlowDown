@@ -36,27 +36,34 @@ enum InferenceIntentHandler {
         var resolveModelIdentifier: (ShortcutsEntities.ModelEntity?) throws -> ModelManager.ModelIdentifier = {
             try InferenceIntentHandler.resolveModelIdentifier(model: $0)
         }
+
         var modelCapabilities: (ModelManager.ModelIdentifier) -> Set<ModelCapabilities> = {
             ModelManager.shared.modelCapabilities(identifier: $0)
         }
+
         var preparePrompt: () -> String = {
             InferenceIntentHandler.preparePrompt()
         }
+
         var enabledToolsProvider: () -> [ModelTool] = {
             ModelToolsManager.shared.enabledTools
         }
+
         var shouldExposeMemory: (Bool, [ModelTool]) -> Bool = { modelWillExecuteTools, enabledTools in
             ModelToolsManager.shouldExposeMemory(
                 modelWillExecuteTools: modelWillExecuteTools,
                 enabledTools: enabledTools,
             )
         }
+
         var proactiveMemoryContextProvider: () async -> String? = {
             await MemoryStore.shared.formattedProactiveMemoryContext()
         }
+
         var memoryWritingToolsProvider: () -> [ModelTool] = {
             InferenceIntentHandler.allWritingMemoryTools()
         }
+
         var streamingInfer: (ModelManager.ModelIdentifier, [ChatRequestBody.Message], [ChatRequestBody.Tool]?) async throws -> AsyncThrowingStream<ChatResponseChunk, Error> = { modelID, input, tools in
             try await ModelManager.shared.streamingInfer(
                 with: modelID,
@@ -64,16 +71,18 @@ enum InferenceIntentHandler {
                 tools: tools,
             )
         }
+
         var executeMemoryWritingToolCalls: ([ToolRequest], [ModelTool]) async -> Void = { toolCalls, tools in
             await InferenceIntentHandler.executeMemoryWritingToolCalls(toolCalls, using: tools)
         }
+
         var persistConversation: @MainActor (
             ModelManager.ModelIdentifier,
             String,
             [RichEditorView.Object.Attachment],
             String,
             String,
-            Date
+            Date,
         ) -> Void = { modelIdentifier, userMessage, attachments, response, reasoning, date in
             InferenceIntentHandler.persistQuickReplyConversation(
                 modelIdentifier: modelIdentifier,
@@ -84,9 +93,12 @@ enum InferenceIntentHandler {
                 date: date,
             )
         }
+
         var clock: () -> Date = { Date() }
 
-        static var live: Self { .init() }
+        static var live: Self {
+            .init()
+        }
     }
 
     private struct PreparedImageResources {

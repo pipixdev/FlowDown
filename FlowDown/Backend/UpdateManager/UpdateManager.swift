@@ -99,7 +99,7 @@ class UpdateManager: NSObject {
         [.fromGitHub].contains(currentChannel)
     }
 
-    private convenience override init() {
+    override private convenience init() {
         self.init(
             bundleInfoProvider: Bundle.main,
             receiptStateProvider: FileManager.default,

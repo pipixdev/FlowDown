@@ -41,7 +41,7 @@ import Foundation
         typealias ExistingActivityProvider = () -> (any LiveActivityControlling)?
         typealias ActivityControllerFactory = (
             _ attributes: FlowDownWidgetsAttributes,
-            _ state: FlowDownWidgetsAttributes.ContentState
+            _ state: FlowDownWidgetsAttributes.ContentState,
         ) throws -> any LiveActivityControlling
         typealias ExecutingSessionCountProvider = () -> Int
 

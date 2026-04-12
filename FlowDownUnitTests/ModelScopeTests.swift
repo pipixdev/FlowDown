@@ -10,13 +10,13 @@ struct ModelScopeTests {
 
         #expect(
             CloudModel.ResponseFormat.inferredFormat(
-                fromEndpoint: " HTTPS://api.example.com/v1/chat/completions/?query=1#fragment "
-            ) == .chatCompletions
+                fromEndpoint: " HTTPS://api.example.com/v1/chat/completions/?query=1#fragment ",
+            ) == .chatCompletions,
         )
         #expect(
             CloudModel.ResponseFormat.inferredFormat(
-                fromEndpoint: "https://api.example.com/responses/"
-            ) == .responses
+                fromEndpoint: "https://api.example.com/responses/",
+            ) == .responses,
         )
         #expect(CloudModel.ResponseFormat.inferredFormat(fromEndpoint: "") == missingFormat)
         #expect(CloudModel.ResponseFormat.chatCompletions.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../../models")

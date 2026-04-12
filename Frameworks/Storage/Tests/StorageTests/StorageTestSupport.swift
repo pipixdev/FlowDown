@@ -22,4 +22,3 @@ enum StorageTestSupport {
         try body(storage)
     }
 }
-

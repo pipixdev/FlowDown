@@ -1,5 +1,5 @@
-@testable import FlowDown
 import ChatClientKit
+@testable import FlowDown
 import Foundation
 import Testing
 
@@ -66,4 +66,3 @@ struct InferenceIntentHandlerTests {
         #expect(response == "Executed 1 tool calls")
     }
 }
-

@@ -1,5 +1,5 @@
-@testable import FlowDown
 import Combine
+@testable import FlowDown
 import Foundation
 import ListViewKit
 import Storage

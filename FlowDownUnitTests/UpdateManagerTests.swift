@@ -51,41 +51,41 @@ struct UpdateManagerTests {
     }
 
     @Test
-    func `newestPackage selects the highest available version`() {
+    func `newestPackage selects the highest available version`() throws {
         let manager = makeManager(
             currentChannel: .fromGitHub,
             version: "1.0.0",
             build: "1",
         )
 
-        let package = manager.newestPackage(from: [
-            .init(tag: "1.0.0.9", downloadURL: URL(string: "https://example.com/1")!),
-            .init(tag: "1.10.0.1", downloadURL: URL(string: "https://example.com/2")!),
-            .init(tag: "1.2.0.5", downloadURL: URL(string: "https://example.com/3")!),
+        let package = try manager.newestPackage(from: [
+            .init(tag: "1.0.0.9", downloadURL: #require(URL(string: "https://example.com/1"))),
+            .init(tag: "1.10.0.1", downloadURL: #require(URL(string: "https://example.com/2"))),
+            .init(tag: "1.2.0.5", downloadURL: #require(URL(string: "https://example.com/3"))),
         ])
 
         #expect(package?.tag == "1.10.0.1")
     }
 
     @Test
-    func `updatePackage ignores older and equal versions while allowing newer releases`() {
+    func `updatePackage ignores older and equal versions while allowing newer releases`() throws {
         let manager = makeManager(
             currentChannel: .fromGitHub,
             version: "1.2.0",
             build: "3",
         )
 
-        let older = DistributionChannel.RemotePackage(
+        let older = try DistributionChannel.RemotePackage(
             tag: "1.2.0.2",
-            downloadURL: URL(string: "https://example.com/older")!,
+            downloadURL: #require(URL(string: "https://example.com/older")),
         )
-        let equal = DistributionChannel.RemotePackage(
+        let equal = try DistributionChannel.RemotePackage(
             tag: "1.2.0.3",
-            downloadURL: URL(string: "https://example.com/equal")!,
+            downloadURL: #require(URL(string: "https://example.com/equal")),
         )
-        let newer = DistributionChannel.RemotePackage(
+        let newer = try DistributionChannel.RemotePackage(
             tag: "1.2.0.4",
-            downloadURL: URL(string: "https://example.com/newer")!,
+            downloadURL: #require(URL(string: "https://example.com/newer")),
         )
 
         #expect(manager.updatePackage(from: older) == nil)
@@ -104,18 +104,18 @@ struct UpdateManagerTests {
           "prerelease": false
         }
         """
-        let session = URLSessionStub(result: .success((
+        let session = try URLSessionStub(result: .success((
             Data(payload.utf8),
-            HTTPURLResponse(
-                url: URL(string: "https://example.com")!,
+            #require(HTTPURLResponse(
+                url: #require(URL(string: "https://example.com")),
                 statusCode: 200,
                 httpVersion: nil,
-                headerFields: nil
-            )!,
+                headerFields: nil,
+            )),
         )))
-        let client = GitHubReleaseFeedClient(
+        let client = try GitHubReleaseFeedClient(
             session: session,
-            latestReleaseURL: URL(string: "https://example.com/releases/latest")!,
+            latestReleaseURL: #require(URL(string: "https://example.com/releases/latest")),
         )
 
         let release = try await client.latestGitHubRelease()
@@ -138,10 +138,10 @@ struct UpdateManagerTests {
                 prerelease: false,
             ))),
         )
-        #expect(validPackages == [
+        #expect(try validPackages == [
             .init(
                 tag: "2.0.0.1",
-                downloadURL: URL(string: "https://example.com/download")!,
+                downloadURL: #require(URL(string: "https://example.com/download")),
             ),
         ])
 

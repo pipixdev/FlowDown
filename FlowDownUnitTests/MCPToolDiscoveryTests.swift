@@ -124,7 +124,7 @@ struct MCPToolDiscoveryTests {
         let tool = try #require(
             tools.first(where: {
                 $0.toolInfo.serverID == connectedServer.id && $0.toolInfo.name == "translate"
-            })
+            }),
         )
 
         #expect(tool.functionName == "translate")
@@ -169,8 +169,13 @@ private final class DiscoveryConnectionSpy: MCPConnectionControlling {
         self.listToolError = listToolError
     }
 
-    var hasClient: Bool { true }
-    var isConnected: Bool { true }
+    var hasClient: Bool {
+        true
+    }
+
+    var isConnected: Bool {
+        true
+    }
 
     func connect() async throws {}
 

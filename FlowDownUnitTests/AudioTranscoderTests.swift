@@ -1,5 +1,5 @@
-@testable import FlowDown
 import AVFoundation
+@testable import FlowDown
 import Foundation
 import Testing
 
@@ -10,7 +10,7 @@ struct AudioTranscoderTests {
         try cleanTranscoderRoot()
 
         let result = try await AudioTranscoder.transcode(
-            data: try Data(contentsOf: fixtureM4AURL),
+            data: Data(contentsOf: fixtureM4AURL),
             fileExtension: "bin",
         )
 
@@ -25,7 +25,7 @@ struct AudioTranscoderTests {
         try cleanTranscoderRoot()
 
         let result = try await AudioTranscoder.transcode(
-            data: makeWAVData(sampleRate: 44_100, channelCount: 2, duration: 0.25),
+            data: makeWAVData(sampleRate: 44100, channelCount: 2, duration: 0.25),
             fileExtension: "wav",
             output: .compressedQualityWAV,
         )
@@ -33,7 +33,7 @@ struct AudioTranscoderTests {
 
         #expect(result.format == "wav")
         #expect(result.duration > 0)
-        #expect(audioProperties.sampleRate == 8_000)
+        #expect(audioProperties.sampleRate == 8000)
         #expect(audioProperties.channelCount == 1)
         #expect(try transcoderWorkingDirectories().isEmpty)
     }
@@ -152,7 +152,7 @@ private extension AudioTranscoderTests {
         for frame in 0 ..< frameCount {
             let sample = Int16(
                 (sin((2 * .pi * Double(frame) * 440.0) / Double(sampleRate)) * amplitude)
-                    .rounded()
+                    .rounded(),
             )
             for _ in 0 ..< channelCount {
                 appendUInt16LE(UInt16(bitPattern: sample), to: &pcm)
@@ -178,14 +178,14 @@ private extension AudioTranscoderTests {
     }
 
     func appendUInt16LE(_ value: UInt16, to data: inout Data) {
-        data.append(UInt8(value & 0x00ff))
-        data.append(UInt8((value >> 8) & 0x00ff))
+        data.append(UInt8(value & 0x00FF))
+        data.append(UInt8((value >> 8) & 0x00FF))
     }
 
     func appendUInt32LE(_ value: UInt32, to data: inout Data) {
-        data.append(UInt8(value & 0x000000ff))
-        data.append(UInt8((value >> 8) & 0x000000ff))
-        data.append(UInt8((value >> 16) & 0x000000ff))
-        data.append(UInt8((value >> 24) & 0x000000ff))
+        data.append(UInt8(value & 0x0000_00FF))
+        data.append(UInt8((value >> 8) & 0x0000_00FF))
+        data.append(UInt8((value >> 16) & 0x0000_00FF))
+        data.append(UInt8((value >> 24) & 0x0000_00FF))
     }
 }

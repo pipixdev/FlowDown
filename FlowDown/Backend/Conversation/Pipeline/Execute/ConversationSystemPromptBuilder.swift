@@ -8,7 +8,7 @@
 import ChatClientKit
 import Foundation
 
-struct ConversationSystemPromptBuilder {
+enum ConversationSystemPromptBuilder {
     struct Input {
         let userText: String
         let modelName: String

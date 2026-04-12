@@ -16,7 +16,7 @@ final class ChatServiceSpy: ChatService, @unchecked Sendable {
             AnyAsyncSequence(
                 AsyncStream { continuation in
                     continuation.finish()
-                }
+                },
             )
         },
     ) {

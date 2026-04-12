@@ -15,11 +15,10 @@ extension ConversationSession {
         _ modelWillExecuteTools: Bool,
         _ object: RichEditorView.Object,
     ) async {
-        let browsingEnabled: Bool
-        if case .bool(true) = object.options[.browsing] {
-            browsingEnabled = true
+        let browsingEnabled = if case .bool(true) = object.options[.browsing] {
+            true
         } else {
-            browsingEnabled = false
+            false
         }
 
         let liveDependencies = ConversationSystemPromptBuilder.Dependencies.live()

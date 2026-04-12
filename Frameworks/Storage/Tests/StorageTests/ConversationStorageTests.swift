@@ -36,7 +36,7 @@ struct ConversationStorageTests {
             let duplicateID = try #require(
                 storage.conversationDuplicate(identifier: conversation.id) { duplicate in
                     duplicate.update(\.title, to: "Copy")
-                }
+                },
             )
             let duplicateConversation = try #require(storage.conversationWith(identifier: duplicateID))
             let duplicateMessages = storage.listMessages(within: duplicateID)

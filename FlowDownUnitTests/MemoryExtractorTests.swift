@@ -1,5 +1,5 @@
-@testable import FlowDown
 import ChatClientKit
+@testable import FlowDown
 import Foundation
 import Storage
 import Testing
@@ -138,7 +138,7 @@ struct MemoryExtractorTests {
             let contents = memories.map(\.content)
 
             #expect(service.receivedBodies.count == 1)
-            #expect(contents.filter { $0 == "User likes jasmine tea" }.count == 1)
+            #expect(contents.count(where: { $0 == "User likes jasmine tea" }) == 1)
             #expect(contents.contains("User plans a trip to Berlin"))
         }
     }
@@ -213,9 +213,9 @@ struct MemoryExtractorTests {
                 #"["User plans a trip to Tokyo"]"#,
             ])
             let service = ChatServiceSpy(chatHandler: { _ in
-                ChatResponse(
+                await ChatResponse(
                     reasoning: "",
-                    text: await responses.next(),
+                    text: responses.next(),
                     images: [],
                     tools: [],
                 )

@@ -1,6 +1,6 @@
-@testable import FlowDown
 import Combine
 import ConfigurableKit
+@testable import FlowDown
 import Foundation
 import Testing
 
@@ -57,7 +57,7 @@ struct SettingsBackupTests {
             let importURL = try makeBackupFile(items: [
                 .init(
                     key: LiveActivitySetting.storageKey,
-                    data: try encodedConfigurableValue(true),
+                    data: encodedConfigurableValue(true),
                 ),
             ])
             defer { try? FileManager.default.removeItem(at: importURL) }
@@ -155,7 +155,7 @@ private extension SettingsBackupTests {
         return url
     }
 
-    func encodedConfigurableValue<T: Codable>(_ value: T) throws -> Data {
+    func encodedConfigurableValue(_ value: some Codable) throws -> Data {
         let scratchSuiteName = "FlowDownUnitTests.SettingsBackup.Encode.\(UUID().uuidString)"
         let scratchSuite = UserDefaults(suiteName: scratchSuiteName)!
         scratchSuite.removePersistentDomain(forName: scratchSuiteName)

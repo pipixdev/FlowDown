@@ -1,6 +1,6 @@
-@testable import FlowDown
 import AppIntents
 import ChatClientKit
+@testable import FlowDown
 import Foundation
 import Storage
 import Testing
@@ -44,7 +44,7 @@ struct ShortcutIntentSmokeTests {
                 recorder: recorder,
                 modelCapabilities: [],
                 responseText: "Generated reply",
-            )
+            ),
         ) {
             var intent = GenerateResponseIntent()
             intent.model = .init(
@@ -118,7 +118,7 @@ struct ShortcutIntentSmokeTests {
                 recorder: recorder,
                 modelCapabilities: [],
                 responseText: "Short summary",
-            )
+            ),
         ) {
             var intent = SummarizeTextIntent()
             intent.text = "Long article body"
@@ -144,7 +144,7 @@ struct ShortcutIntentSmokeTests {
                 recorder: recorder,
                 modelCapabilities: [],
                 responseText: "Hallo Welt",
-            )
+            ),
         ) {
             var intent = TranslateTextIntent()
             intent.text = "Hello world"
@@ -173,7 +173,7 @@ struct ShortcutIntentSmokeTests {
                 recorder: recorder,
                 modelCapabilities: [.auditory],
                 responseText: "Transcribed speech",
-            )
+            ),
         ) {
             var intent = TranscribeAudioIntent()
             intent.model = .init(
@@ -182,7 +182,7 @@ struct ShortcutIntentSmokeTests {
                 source: .cloud,
             )
             intent.audio = IntentFile(
-                data: makeWAVData(sampleRate: 16_000, channelCount: 1, duration: 0.1),
+                data: makeWAVData(sampleRate: 16000, channelCount: 1, duration: 0.1),
                 filename: "sample.wav",
                 type: .wav,
             )
@@ -272,7 +272,7 @@ private extension ShortcutIntentSmokeTests {
                     userMessage: userMessage,
                     attachments: attachments,
                     response: response,
-                )
+                ),
             )
         }
         return dependencies
@@ -323,7 +323,7 @@ private extension ShortcutIntentSmokeTests {
         for frame in 0 ..< frameCount {
             let sample = Int16(
                 (sin((2 * .pi * Double(frame) * 440.0) / Double(sampleRate)) * amplitude)
-                    .rounded()
+                    .rounded(),
             )
             for _ in 0 ..< channelCount {
                 appendUInt16LE(UInt16(bitPattern: sample), to: &pcm)
@@ -349,14 +349,14 @@ private extension ShortcutIntentSmokeTests {
     }
 
     func appendUInt16LE(_ value: UInt16, to data: inout Data) {
-        data.append(UInt8(value & 0x00ff))
-        data.append(UInt8((value >> 8) & 0x00ff))
+        data.append(UInt8(value & 0x00FF))
+        data.append(UInt8((value >> 8) & 0x00FF))
     }
 
     func appendUInt32LE(_ value: UInt32, to data: inout Data) {
-        data.append(UInt8(value & 0x000000ff))
-        data.append(UInt8((value >> 8) & 0x000000ff))
-        data.append(UInt8((value >> 16) & 0x000000ff))
-        data.append(UInt8((value >> 24) & 0x000000ff))
+        data.append(UInt8(value & 0x0000_00FF))
+        data.append(UInt8((value >> 8) & 0x0000_00FF))
+        data.append(UInt8((value >> 16) & 0x0000_00FF))
+        data.append(UInt8((value >> 24) & 0x0000_00FF))
     }
 }

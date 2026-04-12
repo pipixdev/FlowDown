@@ -1,5 +1,5 @@
-@testable import FlowDown
 import ChatClientKit
+@testable import FlowDown
 import Foundation
 import Storage
 import Testing
@@ -33,7 +33,7 @@ struct ModelManagerInferenceTests {
     }
 
     @Test
-    func `testLocalModel uses injected chat service factory when gpu is stubbed available`() async throws {
+    func `testLocalModel uses injected chat service factory when gpu is stubbed available`() async {
         let manager = ModelManager.shared
         let originalFactory = manager.chatServiceFactory
         let originalGPUProvider = manager.gpuSupportProvider
@@ -47,7 +47,7 @@ struct ModelManagerInferenceTests {
                 AsyncStream { continuation in
                     continuation.yield(.text("YES"))
                     continuation.finish()
-                }
+                },
             )
         })
         manager.chatServiceFactory = { _, _ in service }
