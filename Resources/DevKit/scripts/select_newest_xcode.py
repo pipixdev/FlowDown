@@ -28,7 +28,11 @@ def discover_xcodes() -> list[Path]:
     for path in APPLICATIONS_DIR.iterdir():
         if not path.is_dir() or not path.name.startswith("Xcode") or path.suffix != ".app":
             continue
-        if "beta" in path.name.lower():
+        if path.is_symlink():
+            log(f"skipping {path} (symlink)")
+            continue
+        resolved = path.resolve()
+        if "beta" in path.name.lower() or "beta" in resolved.name.lower():
             log(f"skipping {path} (beta build)")
             continue
         bundles.append(path)
