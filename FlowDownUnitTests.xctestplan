@@ -9,15 +9,6 @@
     }
   ],
   "defaultOptions" : {
-    "codeCoverage" : {
-      "targets" : [
-        {
-          "containerPath" : "container:FlowDown.xcodeproj",
-          "identifier" : "503498BC2D23053D004672BD",
-          "name" : "FlowDown"
-        }
-      ]
-    },
     "performanceAntipatternCheckerEnabled" : true
   },
   "testTargets" : [
