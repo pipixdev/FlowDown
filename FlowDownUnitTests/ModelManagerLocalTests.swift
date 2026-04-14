@@ -1,5 +1,5 @@
 import Combine
-@testable import FlowDown
+@preconcurrency @testable import FlowDown
 import Foundation
 import Storage
 import Testing

@@ -143,7 +143,7 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineModelBackedE2ETests.responseFormats)
     @MainActor
     func `auto rename e2e updates title and icon with one metadata generation flow`(
         responseFormat: CloudModel.ResponseFormat,
@@ -183,7 +183,7 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineModelBackedE2ETests.responseFormats)
     func `conversation compression produces structured summary from fdmodel runtime`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {
@@ -206,8 +206,9 @@ struct OnlineModelBackedE2ETests {
             do {
                 compressedConversationID = try await compressConversation(identifier: sourceConversationID, modelID: modelID)
 
+                let resolvedCompressedID = compressedConversationID!
                 let summary = await MainActor.run {
-                    latestAssistantDocument(in: compressedConversationID!)
+                    latestAssistantDocument(in: resolvedCompressedID)
                 }
 
                 #expect(!summary.isEmpty)
@@ -220,21 +221,23 @@ struct OnlineModelBackedE2ETests {
                         || summary.localizedCaseInsensitiveContains("Carol"),
                 )
             } catch {
+                let cleanupID = compressedConversationID
                 await MainActor.run {
-                    deleteConversationIfPresent(compressedConversationID)
+                    deleteConversationIfPresent(cleanupID)
                     deleteConversationIfPresent(sourceConversationID)
                 }
                 throw error
             }
 
+            let finalCleanupID = compressedConversationID
             await MainActor.run {
-                deleteConversationIfPresent(compressedConversationID)
+                deleteConversationIfPresent(finalCleanupID)
                 deleteConversationIfPresent(sourceConversationID)
             }
         }
     }
 
-    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineModelBackedE2ETests.responseFormats)
     func `template extraction returns reusable template from fdmodel runtime`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {
@@ -280,7 +283,7 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineModelBackedE2ETests.responseFormats)
     func `template rewrite keeps the name when only prompt changes`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {

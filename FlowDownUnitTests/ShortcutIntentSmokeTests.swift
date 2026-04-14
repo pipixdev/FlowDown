@@ -17,7 +17,7 @@ struct ShortcutIntentSmokeTests {
         ConversationManager.shouldShowGuideMessage = false
         defer { ConversationManager.shouldShowGuideMessage = originalShowGuideMessage }
 
-        var intent = CreateNewConversationIntent()
+        let intent = CreateNewConversationIntent()
         intent.switchToConversation = false
 
         let result = try await intent.perform()
@@ -46,7 +46,7 @@ struct ShortcutIntentSmokeTests {
                 responseText: "Generated reply",
             ),
         ) {
-            var intent = GenerateResponseIntent()
+            let intent = GenerateResponseIntent()
             intent.model = .init(
                 id: "shortcut-model",
                 displayName: "Shortcut Model",
@@ -94,7 +94,7 @@ struct ShortcutIntentSmokeTests {
         }
         sdb.messagePut(messages: [userMessage, assistantMessage])
 
-        var intent = SearchConversationsIntent()
+        let intent = SearchConversationsIntent()
         intent.keyword = unique
         intent.resultLimit = 0
 
@@ -120,7 +120,7 @@ struct ShortcutIntentSmokeTests {
                 responseText: "Short summary",
             ),
         ) {
-            var intent = SummarizeTextIntent()
+            let intent = SummarizeTextIntent()
             intent.text = "Long article body"
 
             let result = try await intent.perform()
@@ -146,7 +146,7 @@ struct ShortcutIntentSmokeTests {
                 responseText: "Hallo Welt",
             ),
         ) {
-            var intent = TranslateTextIntent()
+            let intent = TranslateTextIntent()
             intent.text = "Hello world"
             intent.targetLanguage = .german
 
@@ -175,7 +175,7 @@ struct ShortcutIntentSmokeTests {
                 responseText: "Transcribed speech",
             ),
         ) {
-            var intent = TranscribeAudioIntent()
+            let intent = TranscribeAudioIntent()
             intent.model = .init(
                 id: "audio-model",
                 displayName: "Audio Model",

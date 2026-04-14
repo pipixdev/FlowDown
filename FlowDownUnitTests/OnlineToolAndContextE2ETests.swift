@@ -111,7 +111,7 @@ struct OnlineToolAndContextE2ETests {
 
     // MARK: Tests
 
-    @Test(arguments: OnlineToolAndContextE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineToolAndContextE2ETests.responseFormats)
     func `single round tool call produces final answer with tool output`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {
@@ -165,7 +165,7 @@ struct OnlineToolAndContextE2ETests {
         #expect(text.contains("42"), "Expected final answer to include the tool result.")
     }
 
-    @Test(arguments: OnlineToolAndContextE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineToolAndContextE2ETests.responseFormats)
     func `sequential tool calls chain through two rounds`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {
@@ -304,7 +304,7 @@ struct OnlineToolAndContextE2ETests {
         #expect(text.contains("17"), "Final answer should cite the add_numbers tool result. Got: \(text)")
     }
 
-    @Test(arguments: OnlineToolAndContextE2ETests.responseFormats)
+    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled), arguments: OnlineToolAndContextE2ETests.responseFormats)
     func `multi turn conversation recalls earlier user facts`(
         responseFormat: CloudModel.ResponseFormat,
     ) async throws {
