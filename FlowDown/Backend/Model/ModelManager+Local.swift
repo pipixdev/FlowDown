@@ -264,7 +264,7 @@ extension ModelManager {
         }
     }
 
-    func unpackAndImport(modelAt url: URL) -> Result<LocalModel> {
+    func unpackAndImport(modelAt url: URL) -> Result<LocalModel, Error> {
         assert(!Thread.isMainThread)
         guard gpuSupportProvider() else {
             return .failure(NSError(domain: "MLX", code: 2, userInfo: [

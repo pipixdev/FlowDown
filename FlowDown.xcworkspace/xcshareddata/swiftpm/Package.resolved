@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/Digger",
       "state" : {
-        "revision" : "265c84aa4a447564628d2788e63efc3ab7779d7e",
-        "version" : "0.0.5"
+        "revision" : "6bd5c7dfb07b0be8635241fe60508636de83cd43",
+        "version" : "0.1.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ktiays/GlyphixTextFx/",
       "state" : {
-        "revision" : "e1d0aa71c1849363a1bbef061d3d92f10481e62c",
-        "version" : "2.3.6"
+        "revision" : "0905b4b32a0eb5ef1937b79e5a39aec51ae50c2f",
+        "version" : "2.3.7"
       }
     },
     {
@@ -365,8 +365,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ktiays/With",
       "state" : {
-        "revision" : "a45e2f39e82322eb663a256941c06edd520a82e1",
-        "version" : "2.1.1"
+        "revision" : "057601648c8f1a89ba99cbe469b8d5418564d3a3",
+        "version" : "2.1.3"
       }
     },
     {
