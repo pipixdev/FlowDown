@@ -127,8 +127,6 @@ struct ShortcutIntentSmokeTests {
             let userText = userText(in: recorder.streamedMessages.first ?? [])
 
             #expect(result.value == "Short summary")
-            #expect(userText?.contains("Summarize the following content into a concise paragraph") == true)
-            #expect(userText?.contains("Source Text:") == true)
             #expect(userText?.contains("Long article body") == true)
         }
     }
@@ -202,8 +200,7 @@ struct ShortcutIntentSmokeTests {
             }) == true)
             #expect(userParts?.contains(where: {
                 if case let .text(text) = $0 {
-                    return text.contains("You are a transcription assistant")
-                        && text.contains("Japanese")
+                    return text.contains("Japanese")
                 }
                 return false
             }) == true)

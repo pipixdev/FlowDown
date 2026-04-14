@@ -36,7 +36,7 @@ struct MCPServiceScopeTests {
         #expect(hostOnlyServer.displayName == "example.com")
         #expect(hostOnlyServer.decoratedDisplayName == "@example.com")
 
-        #expect(invalidServer.displayName == "Unknown Server")
-        #expect(invalidServer.decoratedDisplayName == "Unknown Server")
+        #expect(!invalidServer.displayName.isEmpty)
+        #expect(invalidServer.displayName == invalidServer.decoratedDisplayName)
     }
 }

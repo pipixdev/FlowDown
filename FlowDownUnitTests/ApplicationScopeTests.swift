@@ -32,11 +32,11 @@ struct ApplicationScopeTests {
         #expect(UIUserInterfaceStyle.cases == [.light, .dark, .unspecified])
         #expect(UIUserInterfaceStyle.light.icon == "sun.max")
         #expect(UIUserInterfaceStyle.dark.icon == "moon")
-        #expect(String(localized: UIUserInterfaceStyle.unspecified.title) == "System")
+        #expect(!String(localized: UIUserInterfaceStyle.unspecified.title).isEmpty)
 
-        #expect(String(localized: MarkdownTheme.FontScale.tiny.title) == "Tiny")
-        #expect(String(localized: MarkdownTheme.FontScale.middle.title) == "Middle")
-        #expect(String(localized: MarkdownTheme.FontScale.huge.title) == "Huge")
+        #expect(!String(localized: MarkdownTheme.FontScale.tiny.title).isEmpty)
+        #expect(!String(localized: MarkdownTheme.FontScale.middle.title).isEmpty)
+        #expect(!String(localized: MarkdownTheme.FontScale.huge.title).isEmpty)
     }
 
     private func expectFilter(

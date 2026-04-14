@@ -21,8 +21,8 @@ struct ModelManagerLocalTests {
         #expect(model.scopeIdentifier == "mlx-community")
         #expect(model.auxiliaryIdentifier == "@localhost@mlx-community")
         #expect(model.tags.contains("@localhost@mlx-community"))
-        #expect(model.tags.contains("Visual"))
-        #expect(model.tags.contains("Tool"))
+        #expect(model.capabilities.contains(.visual))
+        #expect(model.capabilities.contains(.tool))
     }
 
     @Test

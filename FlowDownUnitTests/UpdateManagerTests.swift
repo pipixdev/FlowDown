@@ -209,7 +209,9 @@ private extension UpdateManagerTests {
             )
             Issue.record("Expected release \(release.tagName) to be rejected.")
         } catch {
-            #expect(error.localizedDescription == "Failed to parse release information.")
+            let nsError = error as NSError
+            #expect(nsError.domain == "UpdateManagerError")
+            #expect(nsError.code == 1)
         }
     }
 

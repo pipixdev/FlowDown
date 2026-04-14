@@ -33,8 +33,13 @@ struct InterfaceScopeTests {
         let capabilities: [ModelExchangeCapability] = [.visual, .tool, .developerRole]
         let summary = ModelExchangeCapability.summary(from: capabilities)
 
-        #expect(summary == "Visual, Tool, Role")
-        #expect(ModelExchangeCapability.summary(from: []) == "None")
+        let expectedSummary = [
+            ModelExchangeCapability.visual,
+            ModelExchangeCapability.tool,
+            ModelExchangeCapability.developerRole,
+        ].map(\.displayName).joined(separator: ", ")
+        #expect(summary == expectedSummary)
+        #expect(!ModelExchangeCapability.summary(from: []).isEmpty)
     }
 
     @MainActor

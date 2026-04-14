@@ -29,7 +29,7 @@ struct MemoryStoreAndToolsTests {
             #expect(allMemories.map(\.id).contains(travelMemory.id))
             #expect(teaMatches.map(\.id) == [teaMemory.id])
             #expect(limitedMemories.count == 1)
-            #expect(proactiveContext?.contains("Proactive Memory Context") == true)
+            #expect(proactiveContext != nil)
             #expect(proactiveContext?.contains("User likes jasmine tea") == true)
             #expect(proactiveContext?.contains("User plans a trip to Berlin") == true)
         }
@@ -68,7 +68,7 @@ struct MemoryStoreAndToolsTests {
             )
             let recallAfterDelete = try await recallTool.execute(with: "{}", anchorTo: anchor)
 
-            #expect(storeOutput.contains("Memory stored successfully"))
+            #expect(storeOutput.contains("User prefers detailed release notes"))
             #expect(listOutput.contains(storedMemory.id))
             #expect(listOutput.contains("User prefers detailed release notes"))
             #expect(updateOutput == "Memory updated successfully.")

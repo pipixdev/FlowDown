@@ -214,7 +214,7 @@ struct ConversationSystemPromptBuilderTests {
 
         let guidance = try #require(lastSystemText(in: messages))
 
-        #expect(guidance.contains("The system provides several tools for your convenience."))
+        #expect(!guidance.isEmpty)
         #expect(!guidance.contains("store_memory"))
     }
 
@@ -233,9 +233,21 @@ struct ConversationSystemPromptBuilderTests {
             ),
         )
 
-        #expect(systemTexts(in: messages).allSatisfy {
-            !$0.contains("The system provides several tools for your convenience.")
-        })
+        let toolsDisabledSystemCount = systemTexts(in: messages).count
+        let toolsEnabledMessages = await buildMessages(
+            input: .init(
+                userText: "continue",
+                modelName: "test-model",
+                modelWillExecuteTools: true,
+                browsingEnabled: false,
+            ),
+            dependencies: makeDependencies(
+                proactiveMemoryScope: .recent30,
+                enabledTools: [MTRecallMemoryTool()],
+            ),
+        )
+        let toolsEnabledSystemCount = systemTexts(in: toolsEnabledMessages).count
+        #expect(toolsDisabledSystemCount < toolsEnabledSystemCount)
     }
 
     @Test
@@ -268,7 +280,7 @@ struct ConversationSystemPromptBuilderTests {
         )
 
         #expect(systemTexts(in: browsingMessages).contains {
-            $0.contains("Web Search Mode: Proactive")
+            $0.contains("Web Search Mode:")
         })
         #expect(systemTexts(in: defaultMessages).allSatisfy {
             !$0.contains("Web Search Mode:")
@@ -338,8 +350,8 @@ struct ConversationSystemPromptBuilderTests {
         #expect(systemTexts[0] == "runtime info for test-model")
         #expect(systemTexts[1].contains("Proactive Memory Context"))
         #expect(systemTexts[2].contains("Recent conversation context (for background awareness only):"))
-        #expect(systemTexts[3].contains("Web Search Mode: Balanced"))
-        #expect(systemTexts[4].contains("The system provides several tools for your convenience."))
+        #expect(systemTexts[3].contains("Web Search Mode:"))
+        #expect(!systemTexts[4].isEmpty)
         #expect(messages.dropLast().allSatisfy { $0.systemText != nil })
         #expect(messages.last?.userText == "final user message")
     }

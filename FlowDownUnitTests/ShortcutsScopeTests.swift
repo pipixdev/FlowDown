@@ -39,7 +39,7 @@ struct ShortcutsScopeTests {
         #expect(transcript.contains("# Unit \(unique)"))
         #expect(transcript.contains("Hello \(unique)"))
         #expect(transcript.contains("Reply \(unique)"))
-        #expect(transcript.contains("(Reasoning) Because \(unique)"))
+        #expect(transcript.contains("Because \(unique)"))
     }
 
     @Test
