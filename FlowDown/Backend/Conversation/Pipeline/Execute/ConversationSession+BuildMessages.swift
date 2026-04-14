@@ -64,26 +64,40 @@ extension ConversationSession {
                 guard let toolRequest = decodeToolRequestFromToolMessage(message) else {
                     return
                 }
+                let normalizedToolRequest = await normalizeStoredToolRequest(toolRequest)
                 requestMessages.append(.assistant(content: nil, toolCalls: [
-                    .init(id: toolRequest.id, function: .init(name: toolRequest.name, arguments: toolRequest.args)),
+                    .init(
+                        id: normalizedToolRequest.id,
+                        function: .init(
+                            name: normalizedToolRequest.name,
+                            arguments: normalizedToolRequest.args
+                        )
+                    ),
                 ]))
                 let webSearchContent = content.joined(separator: "\n")
                 requestMessages.append(.tool(
                     content: .text(webSearchContent.isEmpty ? String(localized: "Search completed with no results") : webSearchContent),
-                    toolCallID: toolRequest.id,
+                    toolCallID: normalizedToolRequest.id,
                 ))
             case .toolHint:
                 let content = message.toolStatus.message
                 guard let toolRequest = decodeToolRequestFromToolMessage(message) else {
                     return
                 }
+                let normalizedToolRequest = await normalizeStoredToolRequest(toolRequest)
                 requestMessages.append(.assistant(content: nil, toolCalls: [
-                    .init(id: toolRequest.id, function: .init(name: toolRequest.name, arguments: toolRequest.args)),
+                    .init(
+                        id: normalizedToolRequest.id,
+                        function: .init(
+                            name: normalizedToolRequest.name,
+                            arguments: normalizedToolRequest.args
+                        )
+                    ),
                 ]))
                 let toolContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
                 requestMessages.append(.tool(
                     content: .text(toolContent.isEmpty ? String(localized: "Tool executed successfully with no output") : content),
-                    toolCallID: toolRequest.id,
+                    toolCallID: normalizedToolRequest.id,
                 ))
             default:
                 continue
@@ -131,6 +145,16 @@ extension ConversationSession {
               let toolRequest = try? JSONDecoder().decode(ToolRequest.self, from: data)
         else { return nil }
         return toolRequest
+    }
+
+    func normalizeStoredToolRequest(_ request: ToolRequest) async -> ToolRequest {
+        guard let tool = await ModelToolsManager.shared.findTool(for: request) else {
+            return ToolCallArgumentRepair.normalize(request: request, using: nil)
+        }
+        return ToolCallArgumentRepair.normalize(
+            request: request,
+            using: [tool.definition]
+        )
     }
 
     func makeMessageFromAttachments(

@@ -158,6 +158,10 @@ extension ConversationSession {
             message.update(\.document, to: document)
         }
 
+        pendingToolCalls = pendingToolCalls.map {
+            ToolCallArgumentRepair.normalize(request: $0, using: tools)
+        }
+
         await requestUpdate(view: currentMessageListView)
         requestMessages.append(
             .assistant(

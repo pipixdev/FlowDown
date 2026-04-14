@@ -1,3 +1,4 @@
+@testable import ChatClientKit
 @testable import FlowDown
 import Foundation
 import Testing
@@ -19,5 +20,33 @@ struct ModelToolsScopeTests {
         #expect(String(data: inlineDataURL, encoding: .utf8) == inlineText)
         #expect(String(data: fallbackPlaintext, encoding: .utf8) == "not-base64")
         #expect(AttachmentDataParser.decodeData(from: "data:") == nil)
+    }
+
+    @Test
+    func `web scraper tool repairs empty arguments into object payload`() {
+        let repaired = ToolCallArgumentRepair.normalize(
+            request: ToolRequest(
+                id: "tool-1",
+                name: "scrape_web_page",
+                args: ""
+            ),
+            using: [MTWebScraperTool().definition]
+        )
+
+        #expect(repaired.args == #"{"url":""}"#)
+    }
+
+    @Test
+    func `web search tool repairs empty arguments into object payload`() {
+        let repaired = ToolCallArgumentRepair.normalize(
+            request: ToolRequest(
+                id: "tool-2",
+                name: "web_search",
+                args: ""
+            ),
+            using: [MTWebSearchTool().definition]
+        )
+
+        #expect(repaired.args == #"{"query":""}"#)
     }
 }
