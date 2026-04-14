@@ -5,11 +5,14 @@ import Testing
 
 @Suite(.serialized)
 struct OnlineModelBackedE2ETests {
+    static let responseFormats: [CloudModel.ResponseFormat] = [.chatCompletions, .responses]
+
     private func withTemporaryCloudModel<T>(
+        responseFormat: CloudModel.ResponseFormat,
         _ body: @escaping (ModelManager.ModelIdentifier) async throws -> T,
     ) async throws -> T {
         try await FlowDownTestContext.shared.ensureBootstrappedEnvironment()
-        let model = try OnlineE2ETestSupport.runtimeCloudModel()
+        let model = try OnlineE2ETestSupport.runtimeCloudModel(responseFormat: responseFormat)
 
         await MainActor.run {
             ModelManager.shared.insertCloudModel(model)
@@ -140,10 +143,13 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled))
+    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
     @MainActor
-    func `auto rename e2e updates title and icon with one metadata generation flow`() async throws {
-        try await withTemporaryCloudModel { modelID in
+    func `auto rename e2e updates title and icon with one metadata generation flow`(
+        responseFormat: CloudModel.ResponseFormat,
+    ) async throws {
+        try #require(OnlineE2ETestSupport.isEnabled(for: responseFormat))
+        try await withTemporaryCloudModel(responseFormat: responseFormat) { modelID in
             let originalTitle = "Pending auto rename \(UUID().uuidString.prefix(8))"
             let conversationID = makeConversation(
                 title: originalTitle,
@@ -177,9 +183,12 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled))
-    func `conversation compression produces structured summary from fdmodel runtime`() async throws {
-        try await withTemporaryCloudModel { modelID in
+    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    func `conversation compression produces structured summary from fdmodel runtime`(
+        responseFormat: CloudModel.ResponseFormat,
+    ) async throws {
+        try #require(OnlineE2ETestSupport.isEnabled(for: responseFormat))
+        try await withTemporaryCloudModel(responseFormat: responseFormat) { modelID in
             let sourceConversationID = await MainActor.run {
                 makeConversation(
                     title: "Atlas delivery review",
@@ -225,9 +234,12 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled))
-    func `template extraction returns reusable template from fdmodel runtime`() async throws {
-        try await withTemporaryCloudModel { modelID in
+    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    func `template extraction returns reusable template from fdmodel runtime`(
+        responseFormat: CloudModel.ResponseFormat,
+    ) async throws {
+        try #require(OnlineE2ETestSupport.isEnabled(for: responseFormat))
+        try await withTemporaryCloudModel(responseFormat: responseFormat) { modelID in
             let conversationID = await MainActor.run {
                 makeConversation(
                     title: "Kyoto trip planner",
@@ -268,9 +280,12 @@ struct OnlineModelBackedE2ETests {
         }
     }
 
-    @Test(.enabled(if: OnlineE2ETestSupport.isEnabled))
-    func `template rewrite keeps the name when only prompt changes`() async throws {
-        try await withTemporaryCloudModel { modelID in
+    @Test(arguments: OnlineModelBackedE2ETests.responseFormats)
+    func `template rewrite keeps the name when only prompt changes`(
+        responseFormat: CloudModel.ResponseFormat,
+    ) async throws {
+        try #require(OnlineE2ETestSupport.isEnabled(for: responseFormat))
+        try await withTemporaryCloudModel(responseFormat: responseFormat) { modelID in
             let original = ChatTemplate()
                 .with {
                     $0.name = "Weekly Status"

@@ -5,10 +5,12 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 REPO_ROOT=$(cd "$SCRIPT_DIR/../../.." && pwd -P)
 SUPPORT_DIR="$HOME/.testing"
-API_KEY_FILE="$SUPPORT_DIR/openrouter.sk"
+TOKEN_FILE="$SUPPORT_DIR/flowdown-online-e2e.token"
+ENDPOINT_FILE="$SUPPORT_DIR/flowdown-online-e2e.endpoint"
 E2E_SUPPORT_DIR="/tmp/flowdown-online-e2e"
 ENABLE_MARKER="$E2E_SUPPORT_DIR/flowdown_e2e_enabled"
-RUNTIME_API_KEY_FILE="$E2E_SUPPORT_DIR/openrouter.sk"
+RUNTIME_TOKEN_FILE="$E2E_SUPPORT_DIR/flowdown-online-e2e.token"
+RUNTIME_ENDPOINT_FILE="$E2E_SUPPORT_DIR/flowdown-online-e2e.endpoint"
 
 if [[ -f "$HOME/.zprofile" ]]; then
     source "$HOME/.zprofile"
@@ -21,22 +23,36 @@ fi
 mkdir -p "$SUPPORT_DIR"
 mkdir -p "$E2E_SUPPORT_DIR"
 
-if [[ -z "${OPENROUTER_API_KEY:-}" && -f "$API_KEY_FILE" ]]; then
-    OPENROUTER_API_KEY=$(<"$API_KEY_FILE")
+if [[ -z "${FLOWDOWN_ONLINE_E2E_TOKEN:-}" && -f "$TOKEN_FILE" ]]; then
+    FLOWDOWN_ONLINE_E2E_TOKEN=$(<"$TOKEN_FILE")
 fi
 
-if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
-    echo "[-] OPENROUTER_API_KEY is not configured" >&2
+if [[ -z "${FLOWDOWN_ONLINE_E2E_ENDPOINT:-}" && -f "$ENDPOINT_FILE" ]]; then
+    FLOWDOWN_ONLINE_E2E_ENDPOINT=$(<"$ENDPOINT_FILE")
+fi
+
+if [[ -z "${FLOWDOWN_ONLINE_E2E_TOKEN:-}" ]]; then
+    echo "[-] FLOWDOWN_ONLINE_E2E_TOKEN is not configured" >&2
     exit 1
 fi
 
-printf '%s\n' "$OPENROUTER_API_KEY" > "$API_KEY_FILE"
-printf '%s\n' "$OPENROUTER_API_KEY" > "$RUNTIME_API_KEY_FILE"
-chmod 600 "$API_KEY_FILE" "$RUNTIME_API_KEY_FILE"
+if [[ -z "${FLOWDOWN_ONLINE_E2E_ENDPOINT:-}" ]]; then
+    echo "[-] FLOWDOWN_ONLINE_E2E_ENDPOINT is not configured" >&2
+    exit 1
+fi
+
+export FLOWDOWN_ONLINE_E2E_TOKEN
+export FLOWDOWN_ONLINE_E2E_ENDPOINT
+
+printf '%s\n' "$FLOWDOWN_ONLINE_E2E_TOKEN" > "$TOKEN_FILE"
+printf '%s\n' "$FLOWDOWN_ONLINE_E2E_TOKEN" > "$RUNTIME_TOKEN_FILE"
+printf '%s\n' "$FLOWDOWN_ONLINE_E2E_ENDPOINT" > "$ENDPOINT_FILE"
+printf '%s\n' "$FLOWDOWN_ONLINE_E2E_ENDPOINT" > "$RUNTIME_ENDPOINT_FILE"
+chmod 600 "$TOKEN_FILE" "$ENDPOINT_FILE" "$RUNTIME_TOKEN_FILE" "$RUNTIME_ENDPOINT_FILE"
 touch "$ENABLE_MARKER"
 
 cleanup() {
-    rm -f "$ENABLE_MARKER" "$RUNTIME_API_KEY_FILE"
+    rm -f "$ENABLE_MARKER" "$RUNTIME_TOKEN_FILE" "$RUNTIME_ENDPOINT_FILE"
 }
 
 trap cleanup EXIT

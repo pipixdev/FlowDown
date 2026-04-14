@@ -1,5 +1,4 @@
 import Combine
-import Digger
 @testable import FlowDown
 import Foundation
 import Storage
@@ -148,7 +147,7 @@ struct ModelManagerLocalTests {
             defer { packed.1() }
 
             try await withTemporaryModelManager { importManager in
-                let result: Digger.Result<LocalModel> = await withCheckedContinuation { continuation in
+                let result: Result<LocalModel, Error> = await withCheckedContinuation { continuation in
                     DispatchQueue.global(qos: .userInitiated).async {
                         continuation.resume(returning: importManager.unpackAndImport(modelAt: packed.0))
                     }

@@ -1,7 +1,8 @@
 name: Test
 
 # This workflow runs unit tests on pull requests, and online E2E tests
-# when the OPENROUTER_API_KEY secret is available.
+# when the FLOWDOWN_ONLINE_E2E_TOKEN and FLOWDOWN_ONLINE_E2E_ENDPOINT
+# secrets are available.
 
 on:
   push:
@@ -101,14 +102,15 @@ jobs:
     needs: test
     runs-on: macos-26
     env:
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      FLOWDOWN_ONLINE_E2E_TOKEN: ${{ secrets.FLOWDOWN_ONLINE_E2E_TOKEN }}
+      FLOWDOWN_ONLINE_E2E_ENDPOINT: ${{ secrets.FLOWDOWN_ONLINE_E2E_ENDPOINT }}
     permissions:
       contents: read
     steps:
-      - name: Check API Key
+      - name: Check Secrets
         run: |
-          if [ -z "$OPENROUTER_API_KEY" ]; then
-            echo "::notice::OPENROUTER_API_KEY not available, skipping online E2E tests"
+          if [ -z "$FLOWDOWN_ONLINE_E2E_TOKEN" ] || [ -z "$FLOWDOWN_ONLINE_E2E_ENDPOINT" ]; then
+            echo "::notice::FLOWDOWN_ONLINE_E2E_TOKEN or FLOWDOWN_ONLINE_E2E_ENDPOINT not available, skipping online E2E tests"
             echo "SKIP_E2E=true" >> "$GITHUB_ENV"
           fi
 
