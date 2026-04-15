@@ -165,6 +165,10 @@ final class ConversationSessionManager {
         executingSessions.contains(sessionID)
     }
 
+    var hasExecutingSessions: Bool {
+        !executingSessions.isEmpty
+    }
+
     /// Called when any streaming output receives new text.
     ///
     /// The caller should compare old/new output lengths and pass the delta here.

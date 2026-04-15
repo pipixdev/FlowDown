@@ -19,6 +19,7 @@ import UIKit
 @objc(AppDelegate)
 class AppDelegate: UIResponder, UIApplicationDelegate {
     private var templateMenuCancellable: AnyCancellable?
+    private var isPresentingExitConfirmation = false
 
     func application(
         _ application: UIApplication,
@@ -126,14 +127,74 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+
+    #if targetEnvironment(macCatalyst)
+        @objc func terminate(_: Any?) {
+            requestApplicationExit()
+        }
+
+        @objc override func performClose(_: Any?) {
+            requestApplicationExit()
+        }
+
+        func requestApplicationExit() {
+            requestProtectedTermination {
+                terminateApplication()
+            }
+        }
+
+        private var hasExecutingConversations: Bool {
+            ConversationSessionManager.shared.hasExecutingSessions
+        }
+
+        private func requestProtectedTermination(_ action: @escaping () -> Void) {
+            guard hasExecutingConversations else {
+                action()
+                return
+            }
+            presentExitConfirmationIfNeeded(action: action)
+        }
+
+        private func presentExitConfirmationIfNeeded(action: @escaping () -> Void) {
+            guard !isPresentingExitConfirmation else { return }
+            guard let rootViewController = mainWindow?.rootViewController else {
+                action()
+                return
+            }
+
+            isPresentingExitConfirmation = true
+
+            let alert = AlertViewController(
+                title: String(localized: "Exit"),
+                message: String(localized: "Exiting now will interrupt the running conversation."),
+            ) { [weak self] context in
+                context.addAction(title: String(localized: "Cancel")) {
+                    self?.isPresentingExitConfirmation = false
+                    context.dispose()
+                }
+                context.addAction(title: String(localized: "Exit"), attribute: .accent) {
+                    self?.isPresentingExitConfirmation = false
+                    context.dispose {
+                        action()
+                    }
+                }
+            }
+
+            rootViewController.topMostController.present(alert, animated: true)
+        }
+    #endif
 }
 
 func terminateApplication() -> Never {
-    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-    Task.detached {
-        try await Task.sleep(for: .seconds(1))
+    #if targetEnvironment(macCatalyst)
         exit(0)
-    }
-    sleep(5)
-    fatalError()
+    #else
+        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+        Task.detached {
+            try await Task.sleep(for: .seconds(1))
+            exit(0)
+        }
+        sleep(5)
+        fatalError()
+    #endif
 }

@@ -78,6 +78,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         #endif
     }
+
+    func sceneDidDisconnect(_: UIScene) {
+        #if targetEnvironment(macCatalyst)
+            guard !RecoveryMode.isActivated else { return }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(200))
+                let remainingWindowScenes = UIApplication.shared.connectedScenes
+                    .compactMap { $0 as? UIWindowScene }
+                guard remainingWindowScenes.isEmpty else { return }
+                exit(0)
+            }
+        #endif
+    }
 }
 
 private extension SceneDelegate {

@@ -57617,6 +57617,52 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "Exiting now will interrupt the running conversation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exiting now will interrupt the running conversation."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie jetzt beenden, wird die laufende Konversation unterbrochen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si sales ahora, se interrumpirá la conversación en curso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter maintenant interrompra la conversation en cours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐ終了すると、進行中の会話が中断されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 종료하면 진행 중인 대화가 중단됩니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现在退出会中断正在进行的对话。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

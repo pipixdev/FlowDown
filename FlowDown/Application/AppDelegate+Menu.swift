@@ -87,6 +87,40 @@ extension AppDelegate {
             afterMenu: .preferences,
         )
 
+        #if targetEnvironment(macCatalyst)
+            builder.replace(
+                menu: .close,
+                with: UIMenu(
+                    title: "",
+                    options: .displayInline,
+                    children: [
+                        UIKeyCommand(
+                            title: String(localized: "Close"),
+                            action: #selector(requestAppExitFromMenu(_:)),
+                            input: "w",
+                            modifierFlags: .command,
+                        ),
+                    ],
+                ),
+            )
+
+            builder.replace(
+                menu: .quit,
+                with: UIMenu(
+                    title: "",
+                    options: .displayInline,
+                    children: [
+                        UIKeyCommand(
+                            title: String(localized: "Exit"),
+                            action: #selector(requestAppExitFromMenu(_:)),
+                            input: "q",
+                            modifierFlags: .command,
+                        ),
+                    ],
+                ),
+            )
+        #endif
+
         builder.insertChild(
             UIMenu(
                 title: "",
@@ -171,9 +205,10 @@ extension AppDelegate {
     // MARK: - Menu Actions
 
     var mainWindow: UIWindow? {
-        UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.windows.first }
-            .first
+        let windowScenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+        let windows = windowScenes.flatMap(\.windows)
+        return windows.first(where: \.isKeyWindow) ?? windows.first
     }
 
     @objc func checkForUpdatesFromMenu(_: Any?) {
@@ -193,6 +228,12 @@ extension AppDelegate {
     @objc func openSettingsFromMenu(_: Any?) {
         (mainWindow?.rootViewController as? MainController)?.openSettings()
     }
+
+    #if targetEnvironment(macCatalyst)
+        @objc func requestAppExitFromMenu(_: Any?) {
+            requestApplicationExit()
+        }
+    #endif
 
     // new chat with template
 
